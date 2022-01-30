@@ -5,7 +5,6 @@ from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMous
 import time
 import math
 
-from main.Scripts.directKeys import 
 
 
 mouse_pos = queryMousePosition()

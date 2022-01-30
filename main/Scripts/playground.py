@@ -14,7 +14,7 @@ windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 
 class Miner():
     def __init__(self):
-        self.node_rgb = [58, 144, 76] #RGB of the node name
+        self.node_rgb = [[89, 220, 116], [70, 173, 91], [72, 180, 95], [91, 225, 119]] #RGB of pixels in the node name
         self.screen_size = self.getScreenSize()
         self.screen_pos = self.getScreenCoordinates(self.screen_size) #Position/coordinates of the screen
 
@@ -22,15 +22,18 @@ class Miner():
         '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
         '''
         print('Initiating mining...')
-        match_list = self.pixelOnScreen(self.node_rgb) #Searching for node name
-        node_pos = self.calculateNodePosition(match_list) #Approximating the node position
-        if node_pos is None: #Node not found on the screen
+        match_list = self.pixelsOnScreen(self.node_rgb) #Searching for node name
+        node = self.calculateNodePosition(match_list) #Approximating the node position
+        if node is None: #Node not found on the screen
             return None
         #Check that mining is complete
-        print('I do not know how to mine yet, unfortunately...')
+        moveMouseTo(node[0], node[1]) #Target the node
+        click(node[0], node[1]) #Click the node
+        
         #Collect fallen ore
         print(f'Mining complete.')
         return None
+
 
     def createScreen(self, screen_pos = None):
         screen_pos = self.screen_pos if screen_pos is None else screen_pos #Defaults to the whole screen
@@ -68,14 +71,19 @@ class Miner():
         print(f"Pixel at ({x}, {y}) - Red: {r}, Green: {g}, Blue: {b}")
         return [r,g,b]
 
-    def pixelOnScreen(self, rgb):
+    def pixelsOnScreen(self, rgb):
         '''
-        Enter the r,g,b value of a pixel and return its position on screen in x,y coordinates.
+        Enter the r,g,b value of desirable pixel values and return a list with coordinates
+            where these match on the screen.
+
+        Arg:
+            rgb [list] - This must be a nested list of possible rgb combinations, which should be
+                searched.
 
         Returns:
             [list]: A list of the coordinates where the match was found
         '''
-        assert isinstance(rgb, list) and len(rgb) == 3, 'The RGB value must be specified as a list of length 3.'
+        assert any(isinstance(i, list) for i in rgb), 'The argument must be a nested list'
         print(f'Searching for pixel with rgb value {rgb}...')
         screen = self.createScreen() #Take a snapshot of the screen
         match_count = 0
@@ -83,9 +91,10 @@ class Miner():
         start_time = time.time()
         for y in range(self.screen_size[1]):
             for x in range(self.screen_size[0]):
-                if all(screen[y,x] == rgb):
+                pixel_rgb = screen[y,x].tolist()
+                if pixel_rgb in rgb:
                     match_count = match_count + 1
-                    #print(f'Found a match at position ({x}, {y})')
+                    print(f'Found a match at position ({x}, {y})')
                     match_list.append([x,y])
         search_time = round(time.time() - start_time, 2)
         print(f'Search complete.\nFound {match_count} matching pixels.\nThe search took {search_time} seconds.')
@@ -109,16 +118,17 @@ class Miner():
         Returns:
             list: The coordinates where the node should be located on the screen.
 
-        The method assumes no camera zooming, panning, or moving.
+        The method assumes the camera is maximally zoomed out, at an angle parallel to the ground
         '''
         if match_list == []:
             print('The node location could not be calculated. There are no matching pixels on the screen.')
             return None
         x, y = [item[0] for item in match_list], [item[1] for item in match_list]
         x_, y_ = int(sum(x)/len(x)), int(sum(y)/len(y))
-        node = [x_ - 220, y_ - 220] #The node should be roughly 220 pixels below the node name
+        node = [x_, y_ + 100] #The node should be roughly 220 pixels below the node name
+
         print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
-        #Here try to integrate the existing camera position, proximity to the node etc
+        #Here try to integrate the existing camffera position, proximity to the node etc
         return node
 
     @staticmethod
@@ -169,15 +179,17 @@ class Miner():
 
 
 if __name__ == '__main__':
+    time.sleep(2)
     M = Miner()
 
     #Main method
-    #M.mine()
+    M.mine()
+    #M.printMousePosition()
 
     #Various methods
     #print(M.screen_pos)
-    (r,g,b) = M.getPixelRGB()
-    #match_list = M.pixelOnScreen([58, 144, 76])
+    #(r,g,b) = M.getPixelRGB()
+    #match_list = M.pixelsOnScreen([58, 144, 76])
     #node_pos = M.calculateNodePosition(match_list)
     #M.openScreen()
     #M.printMousePosition()
