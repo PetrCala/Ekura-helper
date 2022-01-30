@@ -1,48 +1,126 @@
 from ctypes import windll
 import cv2
 from PIL import ImageGrab
+from cv2 import mean #Capturing screen
+#import pytesseract #Text recognition
 import numpy as np
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
 import time
 import math
 import sys
 
+windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 
-#windll = c.windll.kernel32
-#cdll = c.cdll.msvcrt
-#test = c.c_int()
 
 class Miner():
     def __init__(self):
+        self.node_rgb = [58, 144, 76] #RGB of the node name
         self.screen_size = self.getScreenSize()
         self.screen_pos = self.getScreenCoordinates(self.screen_size) #Position/coordinates of the screen
-        #self.game_coords = self.getGameCoords(self.screen_pos)
 
-
-    def getGameCoords(self):
+    def mine(self):
+        '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
         '''
-        Return a list of 4 coordinates marking the active game window.
+        print('Initiating mining...')
+        match_list = self.pixelOnScreen(self.node_rgb) #Searching for node name
+        node_pos = self.calculateNodePosition(match_list) #Approximating the node position
+        if node_pos is None: #Node not found on the screen
+            return None
+        #Check that mining is complete
+        print('I do not know how to mine yet, unfortunately...')
+        #Collect fallen ore
+        print(f'Mining complete.')
+        return None
 
-        Check for ... and ..., from which the game window size and position is computed.
+    def createScreen(self, screen_pos = None):
+        screen_pos = self.screen_pos if screen_pos is None else screen_pos #Defaults to the whole screen
+        screen = np.array(ImageGrab.grab(bbox=screen_pos))
+        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB) #Original color scale
+        #screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY) #Grey color scale
+        return screen
+
+    def openScreen(self):
+        '''Open the screenshot for viewing.
         '''
-        pos = self.screen_pos
-        screen = self.createScreen(pos) #Computer screen
+        win_name = 'Ekura screenshot'
+        window_res = [int(self.screen_size[0]*0.9), int(self.screen_size[1]*0.9)]
 
-        print(screen)
-        x1 = 0
-        y1 = 0
-        x2 = 0
-        y2 = 0
+        screen = self.createScreen() #Take a screenshot
         
-        return [x1,y1,x2,y2]
+        cv2.namedWindow(win_name, cv2.WINDOW_NORMAL) # Create a Named Window
+        cv2.moveWindow(win_name, 0, 0) # Move it to (X,Y)
+        cv2.imshow(win_name, screen) # Show the Image in the Window
+        cv2.resizeWindow(win_name, window_res[0], window_res[1])   # Resize the Window
+        cv2.waitKey(0); cv2.destroyAllWindows(); cv2.waitKey(1) #Handle closing of the window
+        return None
 
+    def getPixelRGB(self):
+        '''Get a RGB value of the pixel the mouse is pointing at.
 
-    #Delete later
-    def mouseIn(self):
-        on_screen = self.mouseOnScreen(self.screen_pos)
-        state = 'is' if on_screen else 'is not'
-        print(f'The mouse {state} on screen.')
+        Returns:
+            list: RGB value returned as a list in the order R,G,B.
+        '''
+        assert self.mouseOnScreen(self.screen_pos), 'The mouse is not on screen'
+        mouse = queryMousePosition() #Get mouse position
+        x, y = mouse.x, mouse.y
+        screen = self.createScreen() #Computer screen snapshot
+        (r, g, b) = screen[y,x]
+        print(f"Pixel at ({x}, {y}) - Red: {r}, Green: {g}, Blue: {b}")
+        return [r,g,b]
+
+    def pixelOnScreen(self, rgb):
+        '''
+        Enter the r,g,b value of a pixel and return its position on screen in x,y coordinates.
+
+        Returns:
+            [list]: A list of the coordinates where the match was found
+        '''
+        assert isinstance(rgb, list) and len(rgb) == 3, 'The RGB value must be specified as a list of length 3.'
+        print(f'Searching for pixel with rgb value {rgb}...')
+        screen = self.createScreen() #Take a snapshot of the screen
+        match_count = 0
+        match_list = []
+        start_time = time.time()
+        for y in range(self.screen_size[1]):
+            for x in range(self.screen_size[0]):
+                if all(screen[y,x] == rgb):
+                    match_count = match_count + 1
+                    #print(f'Found a match at position ({x}, {y})')
+                    match_list.append([x,y])
+        search_time = round(time.time() - start_time, 2)
+        print(f'Search complete.\nFound {match_count} matching pixels.\nThe search took {search_time} seconds.')
+        return match_list
+
+    def printMousePosition(self):
+        m = queryMousePosition()
+        x = m.x
+        y = m.y
+        print(f'The mouse position is\nx:{x}\ny:{y}')
+        return None
     
+    @staticmethod
+    def calculateNodePosition(match_list):
+        '''Input a list of coordinates where a match was found with the node name on the screen
+        and determine the approximate node position.
+
+        Args:
+            match_list (list): A (nested) list of coordinates
+
+        Returns:
+            list: The coordinates where the node should be located on the screen.
+
+        The method assumes no camera zooming, panning, or moving.
+        '''
+        if match_list == []:
+            print('The node location could not be calculated. There are no matching pixels on the screen.')
+            return None
+        x, y = [item[0] for item in match_list], [item[1] for item in match_list]
+        x_, y_ = int(sum(x)/len(x)), int(sum(y)/len(y))
+        node = [x_ - 220, y_ - 220] #The node should be roughly 220 pixels below the node name
+        print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
+        #Here try to integrate the existing camera position, proximity to the node etc
+        return node
+
     @staticmethod
     def mouseOnScreen(screen_pos):
         '''Specify the screen position as a list of coordinates and check whether the mouse is within these coordinates.
@@ -57,12 +135,6 @@ class Miner():
         pos = queryMousePosition() #Get mouse position
         on_screen = screen_pos[0] < pos.x < screen_pos[2] and screen_pos[1] < pos.y < screen_pos[3]
         return True if on_screen else False
-
-    @staticmethod
-    def createScreen(screen_pos):
-        screen = np.array(ImageGrab.grab(bbox=screen_pos))
-        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
-        return screen
 
     @staticmethod
     def getScreenCoordinates(screen_size):
@@ -87,7 +159,6 @@ class Miner():
         '''
         if sys.platform[0:3] == 'win':
             user32 = windll.user32
-
             return [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
         else:
             raise SystemError('The code must be ran on the Windows platform')
@@ -99,7 +170,18 @@ class Miner():
 
 if __name__ == '__main__':
     M = Miner()
-    #M.mouseIn()
-    M.getGameCoords()
 
-#printMousePosition()
+    #Main method
+    #M.mine()
+
+    #Various methods
+    #print(M.screen_pos)
+    (r,g,b) = M.getPixelRGB()
+    #match_list = M.pixelOnScreen([58, 144, 76])
+    #node_pos = M.calculateNodePosition(match_list)
+    #M.openScreen()
+    #M.printMousePosition()
+    
+#Useful
+#(58, 144, 76) <- surely part of the node, 18 matches - green name
+#(146, 126, 134) <- diamond ore, possibly
