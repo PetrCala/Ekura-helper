@@ -26,9 +26,9 @@ class Miner():
         node = self.calculateNodePosition(match_list) #Approximating the node position
         if node is None: #Node not found on the screen
             return None
-        #Check that mining is complete
+        #Mine
         moveMouseTo(node[0], node[1]) #Target the node
-        click(node[0], node[1]) #Click the node
+        click(node[0], node[1]) #Click the node #Does not work with Ekura
         
         #Collect fallen ore
         print(f'Mining complete.')
@@ -179,11 +179,11 @@ class Miner():
 
 
 if __name__ == '__main__':
-    time.sleep(2)
+    pass
     M = Miner()
 
     #Main method
-    M.mine()
+    #M.mine()
     #M.printMousePosition()
 
     #Various methods
