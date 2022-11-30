@@ -1,14 +1,12 @@
 using System;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
 namespace MINER
 {
-    /// <summary>
-    /// Interaction logic
-    /// </summary>
     public partial class MainWindow : MainWindow
     {
         int defaultProcessId, currentProcessId;

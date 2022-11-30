@@ -10,27 +10,33 @@
         Background="White"
         Title="Ekura Miner">
   <Grid>
-    <Button Content="Find"
+    <Button x:Name = "Find"
+            Content="Find"
             Width="75.2"
             Margin="8,404.8,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Grid.Column="0"
-            Grid.Row="0" />
-    <Button Content="Mine"
+            Grid.Row="0"
+            Click = "Button_Click"/>
+    <Button x:Name = "Mine"
+            Content="Mine"
             Width="75.2"
             Margin="91.2,404.8,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Grid.Column="0"
-            Grid.Row="0" />
-    <Button Content="Stop"
+            Grid.Row="0"
+            Click = "Button_Click_1"/>
+    <Button x:Name = "Stop"
+            Content="Stop"
             Width="75.2"
             Margin="0,404.8,380.8,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Grid.Column="0"
-            Grid.Row="0" />
+            Grid.Row="0"
+            Click = "Button_Click_2"/>
     <ListBox x:Name="Processlist"
              Width="307.2"
              Height="388.8"
@@ -39,6 +45,7 @@
              VerticalAlignment="Top"
              BorderThickness="1,1,1,1"
              Grid.Column="0"
-             Grid.Row="0" />
+             Grid.Row="0"
+             SelectionChanged="Processlist_SelectionChanged"/>
   </Grid>
 </Window>
