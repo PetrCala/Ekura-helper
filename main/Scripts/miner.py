@@ -76,7 +76,7 @@ class Miner(Base):
             self.mining_finished = True
         ore_gone = self.checkStringForMatches(msg, MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
         if ore_gone > 1: # Check whether the node had not disappeared yet
-            self.mining_over = True
+            self.mining_impossible = True
         return None
 
     def findNode(self):
