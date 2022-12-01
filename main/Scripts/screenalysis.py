@@ -16,7 +16,7 @@ import math
 import sys
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-#pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract' # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
 class Screenalysis(Base):
@@ -26,8 +26,8 @@ class Screenalysis(Base):
     def main(self):
         # pixel = self.getPixelRGB()
         # print(pixel)
-        # self.readTextInRange(view_range = True)
-        self.getMousePosition(scale = True, verb = True)        
+        self.readTextInRange(MINING_TEXT_COORD, view_range = True)
+        # self.getMousePosition(scale = True, verb = True)        
 
     def calculateCoordRange(self):
         '''Click twice on the screen, and return a list of coordinates marking

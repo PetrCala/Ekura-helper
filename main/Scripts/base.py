@@ -14,7 +14,7 @@ import math
 import sys
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-#pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract' # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
 class classproperty(property):
@@ -94,30 +94,42 @@ class Base():
             self.openScreen(range_pixels, color_scale = 'orig')
         return pytesseract.image_to_string(img, lang = lang)
 
-    def createScreen(self, screen_pos = None):
-        '''Specify the range of pixels for the screen and return an array of the values
-        of all pixels on that screen.
-
-        Args:
-            screen_pos (list, optional): List of the screen coordinates. Defaults to None.
-
-        Returns:
-            screen [list]: List of the screen pixel values.
+    def createScreen(self, screen_pos:list = None, color_scale = 'gray'):
+        '''Return a numpy array representing pixels on a screen. Specify the range
+        of the screen with "screen_pos".
+        :args:
+            screen_pos[list] - A list of 4 integers specifying the range where
+                the screen should be taken. Defaults to None (whole screen).
+            color_scale[str] - Color scale which the screenshot should take.
+                Can be set to 'gray', 'orig'.
         '''
-        screen_pos = self.screen_pos if screen_pos is None else screen_pos #Defaults to the whole screen
+        if screen_pos is None:
+            screen_pos = self.screen_pos # Default to the whole screen
+        if not len(screen_pos) == 4:
+            raise ValueError('The screen_pos argument must be a list of length 4')
         screen = np.array(ImageGrab.grab(bbox=screen_pos))
-        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB) #Original color scale
-        #screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY) #Grey color scale
-        return screen
+        if color_scale == 'gray':
+            return cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+        elif color_scale == 'orig':
+            return cv2.cvtColor(screen, cv2.COLOR_BGR2RGB) #Original color scale
+        raise ValueError('The color_scale argument is misspecified.')
 
-    def openScreen(self):
+    def openScreen(self, screen_pos:list = None, win_name:str = 'Ekura screenshot', color_scale = 'gray'):
         '''Open the screenshot for viewing.
+        :args:
+            win_name[str] - Name of the window.
+            screen_pos[list, optional] - List of coordinates where the screenshot
+                should be taken. If None, use the whole game screen. Defaults to None.
         '''
-        win_name = 'Ekura screenshot'
-        window_res = [int(self.screen_size[0]*0.9), int(self.screen_size[1]*0.9)]
-
-        screen = self.createScreen() #Take a screenshot
-        
+        scale = 1
+        if screen_pos is None:
+            screen_pos = self.screen_pos
+            scale = 0.9 # Resize if fullscreen
+        screen = self.createScreen(screen_pos, color_scale=color_scale) #Take a screenshot
+        window_width = screen_pos[2] - screen_pos[0]
+        window_height = screen_pos [3] - screen_pos[1]
+        window_res = [int(window_width*scale), int(window_height*scale)] # Window resizing
+    
         cv2.namedWindow(win_name, cv2.WINDOW_NORMAL) # Create a Named Window
         cv2.moveWindow(win_name, 0, 0) # Move it to (X,Y)
         cv2.imshow(win_name, screen) # Show the Image in the Window
