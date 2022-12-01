@@ -6,7 +6,7 @@ from cv2 import mean #Capturing screen
 from static import *
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import time
@@ -160,7 +160,7 @@ class Base():
                 pixel_rgb = screen[y,x].tolist()
                 if pixel_rgb in rgb:
                     match_count = match_count + 1
-                    print(f'Found a match at position ({x}, {y})')
+                    # print(f'Found a match at position ({x}, {y})')
                     match_list.append([x,y])
         search_time = round(time.time() - start_time, 2)
         print(f'Search complete.\nFound {match_count} matching pixels.\nThe search took {search_time} seconds.')
@@ -191,27 +191,28 @@ class Base():
             raise ValueError('Only roman numbers can be converted.')
         return keyboard._KeyCode(char = key)
         
-    def useKeys(self, keys, sleep = True):
+    def useKeys(self, keys):
         '''For each key in keys, press this key. Keys can be any iterable object.
         '''
         for key in keys:
-            self.useKey(key, sleep = sleep)
+            self.useKey(key)
         return None
 
-    def useKey(self, key, method = 'tap', sleep = True):
+    def useKey(self, key):
         '''An extended method for handling more complex key pressing.
         :args:
             key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
             method[str] - Method by which the key shall be used. Must be an attribute of the keyboard.
             sleep[bool] - If true, insert a 0.2 sleep time after the key press. Defaults to True.
         '''
-        if not hasattr(keyboard, method):
-            raise ValueError('You are trying to perform an invalid operation on the keyboard.')
+        if not key in KEYS.keys():
+            raise ValueError('This key cannot be pressed')
         if key in self.numbers:
             key = self.num_key(key) #Parse a roman number
-        getattr(keyboard, method)(key) #Tap, press,... the key
-        if sleep:
-            time.sleep(0.7)
+        key_hx = KEYS.get(key) 
+        PressKey(key_hx)
+        time.sleep(1)
+        ReleaseKey(key_hx)
         return None
 
     @staticmethod

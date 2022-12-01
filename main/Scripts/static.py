@@ -7,10 +7,24 @@
 PYTESSERACT_PATH = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract' # 'tesseract' app in the Tesseract-OCR 
 TESSDATA_DIR_CONFIG = r'--tessdata-dir "C:\\Program Files (x86)\\Tesseract-OCR\\tessdata"' # "tessdata" folder in the Tesseract-OCR
 
+### KEYS ###
+KEYS = {
+    'A':0x1E,
+    'C':0x2E,
+    'D':0x20,
+    'I':0x17,
+    'K':0x25,
+    'M':0x32,
+    'S':0x1F,
+    'W':0x11,
+    'Z':0x2C,
+    'SPACE':0x39,
+}
+
 ### MINING PROCESS ###
 
 # Pixel colors
-NODE_PIXELS = [[89, 220, 116], [70, 173, 91], [72, 180, 95]] # Node - green
+NODE_PIXELS = [[46, 115, 61], [65, 162, 85], [89, 220, 116], [89, 222, 117], [84, 208, 110], [70, 173, 91], [72, 180, 95]] # Node - green
 
 # Regex patterns
 COORD_REGEX = r'\(\d+,\ \d+\)'

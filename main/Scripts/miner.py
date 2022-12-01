@@ -7,7 +7,7 @@ from base import Base
 from static import *
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import re
@@ -29,7 +29,7 @@ class Miner(Base):
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
 
     def main(self):
-        '''Main method of the Miner class
+        '''Main method of the Miner clsass
         '''
         self.mineOre()
         return None

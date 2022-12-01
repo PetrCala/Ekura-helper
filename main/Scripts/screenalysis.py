@@ -8,7 +8,7 @@ from static import *
 from pynput.keyboard import Key, HotKey, Controller
 from pynput import mouse
 import pytesseract #Text recognition
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import time
@@ -26,8 +26,8 @@ class Screenalysis(Base):
     def main(self):
         # pixel = self.getPixelRGB()
         # print(pixel)
-        #self.getPixelRGB()
-        self.getMousePosition(scale = True, verb = True)        
+        self.getPixelRGB()
+        #self.getMousePosition(scale = True, verb = True)        
 
     def calculateCoordRange(self):
         '''Click twice on the screen, and return a list of coordinates marking
