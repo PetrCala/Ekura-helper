@@ -1,12 +1,14 @@
-from ctypes import windll
+﻿from ctypes import windll
 import cv2
 from PIL import ImageGrab
 from cv2 import mean #Capturing screen
-#import pytesseract #Text recognition
-import numpy as np
+
+from static import *
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
+
+import numpy as np
 import time
 import math
 import sys
@@ -15,76 +17,93 @@ windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 #pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract' # Pytesseract path
 keyboard = Controller()
 
-class Miner():
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
+
+class Base():
     def __init__(self):
-        self.node_rgb = [[89, 220, 116], [70, 173, 91], [72, 180, 95], [91, 225, 119]] #RGB of pixels in the node name
-        self.screen_size = self.getScreenSize()
-        self.screen_pos = self.getScreenCoordinates(self.screen_size) #Position/coordinates of the screen
-        self.mining_finished = True # Boolean to indicate finished mining
+        pass
 
     def main(self):
         '''Main method of the Base class
         '''
-        #self.clickScreen()
-        #self.useKey('W', method = 'press')
-        #time.sleep(2)
-        #self.useKey('W', method = 'release')
+        pass
 
-        #Main method
-        self.mine()
-        # self.printMousePosition()
-
-        #Various method
-        #self.openScreen()
-
-        return None
-
-    def initiate_mining(self, node:list):
-        '''Insert a pair of coordinates as a list and start mining at these coordinates.
-        '''
-        moveMouseTo(node[0], node[1]) #Target the node
-        time.sleep(0.5) # Allow for cursor positioning
-        click(node[0], node[1]) #Click the node
-        self.mining_finished = False # Mining started
-        return None
-
-    def check_mining_status(self):
-        '''Check whether the mining has yet finished. If so, set the '.mining_finished'
-        attribute to True. Return None.
-        '''
-        if 1 == 1: # Mining is done - finish this part
-            self.mining_finished = True
-        return None
-
-    def mine(self):
-        '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
-        '''
-        print('Initiating mining...')
-        match_list = self.pixelsOnScreen(self.node_rgb) #Searching for node name
-        node = self.calculateNodePosition(match_list) #Approximating the node position
-        if node is None: #Node not found on the screen
-            print(f'Failed to find a node.')
-            return None
-        #Mine
-        self.initiate_mining(node)
-        if self.mining_finished: # Mining initialization failed
-            print('Failed to initiate mining')
-            return None
-        while self.mining_finished is False: # Wait until mining is finished
-            time.sleep(3) # Wait a while - maybe randomize this
-            self.check_mining_status() # If mining is over, set '.mining_finished' to false
-        self.useKey('Z') # Collect fallen ore
-
-        print(f'Mining complete.')
-        return None
-    
     @property
     def numbers(self):
         '''A list of the 10 roman numbers as strings. Used for keyboard input.
         '''
         return [str(i) for i in range(11)]
 
+    def calculateCoords(self, coords:list, from_scale = True):
+        '''Input a list of scale coordinates and return a list of the actual coordinates
+        for the user's screen. It is possible to calculate in reverse direction too.
+        :args:
+            scale_coords[list] - A list of two scale coordinates marking a certain point on
+                the screen.
+            from_scale[bool, optional] - If True, input scale coordinates and return the actual
+                coordinates on user's screen. If False, do the inverse. Defaults to True.
+            
+        :note:
+            Scale coordinates - An initial point of [0.5,0.5] marks a point in the middle of the screen.
+                In other words, it is 50 percent from top left corner in either direction.
+            Actual coordinates - Actual pixels of the screen, such as [1000,500].
+            Also assumes the game covers all of the screen, and does not move. Might change later.
+        '''
+        if not len(coords) == 2:
+            raise ValueError('The coordinates must be input as a list of length 2')
+        x_inp, y_inp = coords
+        screen_width, screen_height = self.screen_size
+        if from_scale:
+            x = int(screen_width * x_inp) # Distance from left bound - x axis
+            y = int(screen_height * y_inp) # Distance from upper bound - y axis
+        else:
+            x = round(x_inp/screen_width, 3)
+            y = round(y_inp/screen_height, 3)
+        return [x, y]
+
+    def rangeToPixels(self, range:list):
+        '''Specify a list of 4 scale coordinates and return a list of four points,
+        which define (in pixels) the top left and bottom right points
+        of the range, respectively.
+
+        Args:
+            range (list): List of four points of the range, in scale.
+        '''
+        if not len(range) == 4:
+            raise ValueError('You must specify the range as a list of four points')
+        start_ = range[0:2]
+        end_ = range[2:4]
+        start = self.calculateCoords(start_)
+        end = self.calculateCoords(end_)
+        return start + end
+
+    def readTextInRange(self, range:list, lang:str = 'ces', view_range:bool = False):
+        '''Specify as a list of scale coordinates the range in which
+        a text should be recognized and return the text as a string.
+        Args:
+            range (list) - A list of scale coordinates.
+            lang (str) - Language of the text in the range. Defaults to 'ces' (Czech).
+            view_range (bool, optional) - If True, also open the screen.
+                Defaults to False.
+        '''
+        range_pixels = self.rangeToPixels(range)
+        img = self.createScreen(range_pixels, color_scale='orig')
+        if view_range:
+            self.openScreen(range_pixels, color_scale = 'orig')
+        return pytesseract.image_to_string(img, lang = lang)
+
     def createScreen(self, screen_pos = None):
+        '''Specify the range of pixels for the screen and return an array of the values
+        of all pixels on that screen.
+
+        Args:
+            screen_pos (list, optional): List of the screen coordinates. Defaults to None.
+
+        Returns:
+            screen [list]: List of the screen pixel values.
+        '''
         screen_pos = self.screen_pos if screen_pos is None else screen_pos #Defaults to the whole screen
         screen = np.array(ImageGrab.grab(bbox=screen_pos))
         screen = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB) #Original color scale
@@ -105,20 +124,6 @@ class Miner():
         cv2.resizeWindow(win_name, window_res[0], window_res[1])   # Resize the Window
         cv2.waitKey(0); cv2.destroyAllWindows(); cv2.waitKey(1) #Handle closing of the window
         return None
-
-    def getPixelRGB(self):
-        '''Get a RGB value of the pixel the mouse is pointing at.
-
-        Returns:
-            list: RGB value returned as a list in the order R,G,B.
-        '''
-        assert self.mouseOnScreen(self.screen_pos), 'The mouse is not on screen'
-        mouse = queryMousePosition() #Get mouse position
-        x, y = mouse.x, mouse.y
-        screen = self.createScreen() #Computer screen snapshot
-        (r, g, b) = screen[y,x]
-        print(f"Pixel at ({x}, {y}) - Red: {r}, Green: {g}, Blue: {b}")
-        return [r,g,b]
 
     def pixelsOnScreen(self, rgb):
         '''
@@ -149,12 +154,23 @@ class Miner():
         print(f'Search complete.\nFound {match_count} matching pixels.\nThe search took {search_time} seconds.')
         return match_list
 
-    def getMousePosition(self):
+    def getMousePosition(self, scale = False, verb = False):
+        '''Get the coordinates of the current mouse position.
+        
+        Arg:
+            scale [bool] - If True, return/print the coordinates as a scale.
+            verb [bool] - If True, only print out the output. If False, return the output
+                as a list of coordinates.
+        '''
         m = queryMousePosition()
         x = m.x
         y = m.y
-        print(f'The mouse position is\nx:{x}\ny:{y}')
-        return None
+        if scale:
+            x, y = self.calculateCoords([x,y], from_scale = False) # Absolute coordinates to scale
+        if verb:
+            print(f'The mouse position is\nx:{x}\ny:{y}')
+            return None
+        return [x,y]
     
     def num_key(self, key):
         '''Convert the string corresponding to a roman number to a key code legible by the keyboard.
@@ -187,30 +203,6 @@ class Miner():
         return None
 
     @staticmethod
-    def calculateNodePosition(match_list):
-        '''Input a list of coordinates where a match was found with the node name on the screen
-        and determine the approximate node position.
-
-        Args:
-            match_list (list): A (nested) list of coordinates
-
-        Returns:
-            list: The coordinates where the node should be located on the screen.
-
-        The method assumes the camera is maximally zoomed out, at an angle parallel to the ground
-        '''
-        if match_list == []:
-            print('The node location could not be calculated. There are no matching pixels on the screen.')
-            return None
-        x, y = [item[0] for item in match_list], [item[1] for item in match_list]
-        x_, y_ = int(sum(x)/len(x)), int(sum(y)/len(y)) # Mean value for both coordinates
-        node = [x_, y_ + 100] #The node should be roughly 220 pixels below the node name
-
-        print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
-        #Here try to integrate the existing camffera position, proximity to the node etc
-        return node
-
-    @staticmethod
     def mouseOnScreen(screen_pos):
         '''Specify the screen position as a list of coordinates and check whether the mouse is within these coordinates.
 
@@ -225,25 +217,20 @@ class Miner():
         on_screen = screen_pos[0] < pos.x < screen_pos[2] and screen_pos[1] < pos.y < screen_pos[3]
         return True if on_screen else False
 
-    @staticmethod
-    def getScreenCoordinates(screen_size):
-        '''Return a list of 4 coordinates marking the beginning and end of the screen.
-
-        Args:
-            screen_size ([list]): A 2 elements long list denoting the screen size.
-
-        Returns:
-            list: A list of coordinates in the form [x1,y1, x2, y2].
+    @classproperty
+    def screen_pos(cls):
         '''
-        screen_pos = [0,0] + screen_size
-        return screen_pos
-
-    @staticmethod
-    def getScreenSize():
+        Return a list of 4 coordinates marking the beginning and end of the screen
+            in the form [x1,y1, x2, y2].
         '''
-        A class method for retrieving the screen resolution.
+        return [0,0] + cls.screen_size
 
-        Returns:
+    @classproperty
+    def screen_size(cls):
+        '''
+        A static property defining the screen resolution.
+        
+        :return:
             list: A list of two coordinates marking the bottom right part of the screen.
         '''
         if sys.platform[0:3] == 'win':
@@ -264,12 +251,6 @@ class Miner():
     def dist(x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
-
 if __name__ == '__main__':
-    M = Miner()
-    M.main()
-    
-
-#Useful
-#(58, 144, 76) <- surely part of the node, 18 matches - green name
-#(146, 126, 134) <- diamond ore, possibly
+    B = Base()
+    B.main()
