@@ -89,7 +89,7 @@ class Miner():
             [list]: A list of the coordinates where the match was found
         '''
         assert any(isinstance(i, list) for i in rgb), 'The argument must be a nested list'
-        print(f'Searching for pixel with rgb value {rgb}...')
+        print(f'Searching for pixel with rgb values from {rgb}...')
         screen = self.createScreen() #Take a snapshot of the screen
         match_count = 0
         match_list = []

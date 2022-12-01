@@ -10,6 +10,7 @@ import pytesseract #Text recognition
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo, SPACE
 
 import numpy as np
+import re
 import time
 import math
 import sys
@@ -18,29 +19,45 @@ windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
+
 class Miner(Base):
     def __init__(self):
-        pass
         self.mining_finished = True # Boolean to indicate finished mining
+        self.mining_impossible = True # There is no ore to mine - search/wait for a new one
 
     def main(self):
         '''Main method of the Miner class
         '''
-        #self.clickScreen()
-        #self.useKey('W', method = 'press')
-        #time.sleep(2)
-        #self.useKey('W', method = 'release')
-
-        #Main method
-        # self.mine()
-        # self.printMousePosition()
-
-        #Various method
-        #self.openScreen()
-
+        self.mineOre()
         return None
 
-    def initiate_mining(self, node:list):
+    def mineOre(self):
+        '''Initiate the mining process, and keep mining until there is no ore to mine.
+        '''
+        current_char_pos = self.char_pos
+        print(current_char_pos)
+        times_mined = 0
+        print('Looking for a node to start mining...')
+        node = self.findNode()
+        if node is None:
+            return None # No node on the screen to mine (automatically throws a message)
+        print('Found a node. Starting the mining process...')
+        self.mining_impossible = False # Found a node
+        while self.mining_impossible is False and times_mined < 25:
+            self.mineOnce(node)
+            if current_char_pos != self.char_pos: # Re-check character position
+                node = self.findNode()
+                if node is None:
+                    self.mining_impossible = True
+                    break
+            times_mined += 1
+        print('Mining is over. There is no more ore to be mined.')
+        return None
+
+    def initiateMining(self, node:list):
         '''Insert a pair of coordinates as a list and start mining at these coordinates.
         '''
         moveMouseTo(node[0], node[1]) #Target the node
@@ -49,36 +66,45 @@ class Miner(Base):
         self.mining_finished = False # Mining started
         return None
 
-    def check_mining_status(self):
-        '''Check whether the mining has yet finished. If so, set the '.mining_finished'
+    def updateMiningStatus(self):
+        '''Check whether the mining has yet finished. If so, set the 'mining_finished'
         attribute to True. Return None.
         '''
-        if 1 == 1: # Mining is done - finish this part
+        msg = self.readTextInRange(MINING_TEXT_COORD, view_range = False) # Read message log
+        matches = self.checkStringForMatches(msg, MINING_DONE_KEYWORDS, verbose = False)
+        if matches > 1:
             self.mining_finished = True
+        ore_gone = self.checkStringForMatches(msg, MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
+        if ore_gone > 1: # Check whether the node had not disappeared yet
+            self.mining_over = True
         return None
 
-    def mine(self):
-        '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
+    def findNode(self):
+        '''Return a list of coordinates, if node is present on the screen. Return False otherwise.
         '''
-        print('Initiating mining...')
         match_list = self.pixelsOnScreen(NODE_PIXELS) #Searching for node name
         node = self.calculateNodePosition(match_list) #Approximating the node position
         if node is None: #Node not found on the screen
-            print(f'Failed to find a node.')
+            print('Failed to find an node.')
             return None
-        #Mine
-        self.initiate_mining(node)
+        return node
+
+    def mineOnce(self, node:list):
+        '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
+        '''
+        times_checked = 0
+        print('Initiating mining...')
+        self.initiateMining(node)
         if self.mining_finished: # Mining initialization failed
             print('Failed to initiate mining')
             return None
-        while self.mining_finished is False: # Wait until mining is finished
-            time.sleep(3) # Wait a while - maybe randomize this
-            self.check_mining_status() # If mining is over, set '.mining_finished' to false
+        while self.mining_finished is False and times_checked < 20: # Wait until mining is finished
+            time.sleep(2.5) # Wait a while - maybe randomize this
+            self.updateMiningStatus() # If mining is over, set the 'mining_finished' attribute to false
+            times_checked += 1
         self.useKey('Z') # Collect fallen ore
-
         print(f'Mining complete.')
         return None
-    
 
     @staticmethod
     def calculateNodePosition(match_list):
@@ -104,6 +130,16 @@ class Miner(Base):
         #Here try to integrate the existing camffera position, proximity to the node etc
         return node
 
+    @property
+    def char_pos(self):
+        '''Position of the character, given by two coordinates.
+        '''
+        raw_coords = self.readTextInRange(CHAR_POS_COORD)
+        if not re.match(COORD_REGEX, raw_coords):
+            raise ValueError('Could not identify the character\'s coordinates.')
+        coords_set = re.match(COORD_REGEX_EXTRACT, raw_coords)
+        coords = [int(coords_set[1]), int(coords_set[2])] # [x,y]
+        return coords
 
 if __name__ == '__main__':
     M = Miner()

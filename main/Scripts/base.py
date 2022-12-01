@@ -92,7 +92,7 @@ class Base():
         img = self.createScreen(range_pixels, color_scale='orig')
         if view_range:
             self.openScreen(range_pixels, color_scale = 'orig')
-        return pytesseract.image_to_string(img, lang = lang)
+        return pytesseract.image_to_string(img, lang = lang, config = TESSDATA_DIR_CONFIG)
 
     def createScreen(self, screen_pos:list = None, color_scale = 'gray'):
         '''Return a numpy array representing pixels on a screen. Specify the range
@@ -150,8 +150,8 @@ class Base():
             [list]: A list of the coordinates where the match was found
         '''
         assert any(isinstance(i, list) for i in rgb), 'The argument must be a nested list'
-        print(f'Searching for pixel with rgb value {rgb}...')
-        screen = self.createScreen() #Take a snapshot of the screen
+        print(f'Searching for pixel with rgb values from {rgb}...')
+        screen = self.createScreen(color_scale = 'orig') #Take a snapshot of the screen
         match_count = 0
         match_list = []
         start_time = time.time()
@@ -213,6 +213,29 @@ class Base():
         if sleep:
             time.sleep(0.7)
         return None
+
+    @staticmethod
+    def checkStringForMatches(input_string:str, match_list:list, verbose:bool = False):
+        '''Input a string, and a list of words to look for, and return the number
+        of matches found in the string for said list.
+
+        Args:
+            input_string (str): String to search for potential matches.
+            match_list (list): List of words to search for in the string.
+            verbose (bool): If True, print out a message with the number of matches.
+
+        Returns:
+            int: The number of matches found in the string.
+        '''
+        matches = 0
+        input_words = input_string.split()
+        for word in input_words:
+            if word in match_list:
+                matches += 1
+        if verbose:
+            plural = 'es' if matches != 1 else ''
+            print(f'Found {matches} match{plural}.')
+        return matches
 
     @staticmethod
     def mouseOnScreen(screen_pos):
