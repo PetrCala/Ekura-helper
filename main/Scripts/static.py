@@ -27,8 +27,8 @@ KEYS = {
 NODE_PIXELS = [[46, 115, 61], [65, 162, 85], [89, 220, 116], [89, 222, 117], [84, 208, 110], [70, 173, 91], [72, 180, 95]] # Node - green
 
 # Regex patterns
-COORD_REGEX = r'\(\d+,\ \d+\)'
-COORD_REGEX_EXTRACT = r'\((.*),\ (.*)\)'
+CHAR_POS_REGEX = r'\(\d+,\ \d+\)'
+CHAR_POS_REGEX_EXTRACT = r'\((.*),\ (.*)\)'
 
 # Coordinates
 CHAR_POS_COORD = [0.936, 0.207, 0.974, 0.227] # Character position

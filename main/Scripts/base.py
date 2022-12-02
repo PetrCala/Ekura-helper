@@ -5,8 +5,8 @@ from cv2 import mean #Capturing screen
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
 
-from .directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
-from .static import *
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from static import *
 
 import numpy as np
 import time
@@ -281,6 +281,20 @@ class Base():
         '''
         pos = queryMousePosition() # Query cursor position
         click(pos.x, pos.y) # Click
+        return None
+
+    @staticmethod
+    def moveClick(x, y):
+        '''Specify coordinates and click there. Used for clicks in game,
+        automaically adds a small wait window in order to guarantee the click.
+        Returns the cursor back to the starting position.
+        '''
+        pos = queryMousePosition()
+        x_, y_ = pos.x, pos.y # Initial mouse coordinates
+        moveMouseTo(x, y)
+        time.sleep(0.1) # Allow for cursor positioning
+        click(x, y)
+        moveMouseTo(x_,y_) # Return the mouse
         return None
 
     @staticmethod

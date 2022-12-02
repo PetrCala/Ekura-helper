@@ -23,14 +23,10 @@ keyboard = Controller()
 
 def main():
     M = Miner()
-
-    print('hello')
-
+    M.moveClick(500,500)
 
 
 
 
 if __name__ == '__main__':
-    M = Miner()
-
-
+    main()

@@ -5,9 +5,9 @@ from cv2 import mean #Capturing screen
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
 
-from .base import Base
-from .static import *
-from .directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from base import Base
+from static import *
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import re
@@ -57,15 +57,6 @@ class Miner(Base):
         print('Mining is over. There is no more ore to be mined.')
         return None
 
-    def initiateMining(self, node:list):
-        '''Insert a pair of coordinates as a list and start mining at these coordinates.
-        '''
-        moveMouseTo(node[0], node[1]) #Target the node
-        time.sleep(0.5) # Allow for cursor positioning
-        click(node[0], node[1]) #Click the node
-        self.mining_finished = False # Mining started
-        return None
-
     def updateMiningStatus(self):
         '''Check whether the mining has yet finished. If so, set the 'mining_finished'
         attribute to True. Return None.
@@ -76,7 +67,7 @@ class Miner(Base):
             self.mining_finished = True
         ore_gone = self.checkStringForMatches(msg, MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
         if ore_gone > 1: # Check whether the node had not disappeared yet
-            self.mining_impossible = True
+            print('The node has disappeared...')
         return None
 
     def findNode(self):
@@ -94,10 +85,8 @@ class Miner(Base):
         '''
         times_checked = 0
         print('Initiating mining...')
-        self.initiateMining(node)
-        if self.mining_finished: # Mining initialization failed
-            print('Failed to initiate mining')
-            return None
+        self.moveClick(node[0], node[1]) # Click the node
+        self.mining_finished = False # Mining started
         while self.mining_finished is False and times_checked < 30: # Wait until mining is finished
             time.sleep(2) # Wait a while - maybe randomize this
             self.updateMiningStatus() # If mining is over, set the 'mining_finished' attribute to false
