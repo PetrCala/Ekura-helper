@@ -10,6 +10,8 @@ from static import *
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
+import random
+from datetime import datetime, timedelta
 import re
 import time
 import math
@@ -27,23 +29,26 @@ class Miner(Base):
     def __init__(self):
         self.mining_finished = True # Boolean to indicate finished mining
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
+        self.mining_timer = datetime.now() + timedelta(days = -1)
 
     def main(self):
         '''Main method of the Miner clsass
         '''
-        self.mineOre()
-        return None
+        while True:
+            mining_successful = self.mineOre()
+            if not mining_successful: # Ore was not found
+                time.sleep(7)
 
     def mineOre(self):
         '''Initiate the mining process, and keep mining until there is no ore to mine.
+        Return True, if mining was successful, and False, if not.
         '''
         current_char_pos = self.char_pos
-        print(current_char_pos)
         times_mined = 0
         print('Looking for a node to start mining...')
         node = self.findNode()
         if node is None:
-            return None # No node on the screen to mine (automatically throws a message)
+            return False # No node on the screen to mine (automatically throws a message)
         print('Found a node. Starting the mining process...')
         self.mining_impossible = False # Found a node
         while self.mining_impossible is False and times_mined < 35:
@@ -55,20 +60,29 @@ class Miner(Base):
                     break
             times_mined += 1
         print('Mining is over. There is no more ore to be mined.')
-        return None
+        return True
 
-    def updateMiningStatus(self):
+    def checkMiningFinished(self):
         '''Check whether the mining has yet finished. If so, set the 'mining_finished'
-        attribute to True. Return None.
+        attribute to True. Return True, if mining is finished, and False otherwise.
         '''
         msg = self.readTextInRange(MINING_TEXT_COORD, view_range = False) # Read message log
-        matches = self.checkStringForMatches(msg, MINING_DONE_KEYWORDS, verbose = False)
-        if matches > 1:
-            self.mining_finished = True
         ore_gone = self.checkStringForMatches(msg, MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
+        matches = self.checkStringForMatches(msg, MINING_DONE_KEYWORDS, verbose = False)
         if ore_gone > 1: # Check whether the node had not disappeared yet
             print('The node has disappeared...')
-        return None
+            self.mining_impossible = True
+            self.mining_finished = True
+            return True
+        if matches > 1:
+            if datetime.now() - self.mining_timer < timedelta(seconds=6): # Last message had not yet disappeared
+                # print('The message had not yet disappeared... Checking again')
+                return False
+            self.mining_finished = True
+        if ore_gone > 1 or matches > 1:
+            self.mining_timer = datetime.now() # Update mining timer
+            return True
+        return False
 
     def findNode(self):
         '''Return a list of coordinates, if node is present on the screen. Return False otherwise.
@@ -85,12 +99,14 @@ class Miner(Base):
         '''
         times_checked = 0
         print('Initiating mining...')
-        self.moveClick(node[0], node[1]) # Click the node
+        x_, y_ = self.randomizeClicking(node[0], node[1]) # Move the cursor slightly
+        self.moveClick(x_, y_) # Click the node
         self.mining_finished = False # Mining started
         while self.mining_finished is False and times_checked < 30: # Wait until mining is finished
-            time.sleep(2) # Wait a while - maybe randomize this
-            self.updateMiningStatus() # If mining is over, set the 'mining_finished' attribute to false
+            time.sleep(2) # Wait a while
+            self.checkMiningFinished() # Is mining finished (or over)
             times_checked += 1
+        # Possibly refocus the game here (and return focus afterwards) to allow for mulit-tasking
         self.useKey('Z') # Collect fallen ore
         print(f'Mining complete.')
         return None
@@ -119,16 +135,6 @@ class Miner(Base):
         #Here try to integrate the existing camffera position, proximity to the node etc
         return node
 
-    @property
-    def char_pos(self):
-        '''Position of the character, given by two coordinates.
-        '''
-        raw_coords = self.readTextInRange(CHAR_POS_COORD)
-        if not re.match(CHAR_POS_REGEX, raw_coords):
-            raise ValueError('Could not identify the character\'s coordinates.')
-        coords_set = re.match(CHAR_POS_REGEX_EXTRACT, raw_coords)
-        coords = [int(coords_set[1]), int(coords_set[2])] # [x,y]
-        return coords
 
 if __name__ == '__main__':
     M = Miner()

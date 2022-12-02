@@ -11,6 +11,8 @@ from Scripts.miner import Miner
 from Scripts.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
+import random
+from datetime import datetime, timedelta
 import re
 import time
 import math
@@ -23,10 +25,7 @@ keyboard = Controller()
 
 def main():
     M = Miner()
-    M.moveClick(500,500)
-
-
-
+    moveMouseTo(500,500)
 
 if __name__ == '__main__':
     main()

@@ -9,6 +9,9 @@ from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMous
 from static import *
 
 import numpy as np
+import random
+from datetime import datetime, timedelta
+import re
 import time
 import math
 import sys
@@ -182,7 +185,7 @@ class Base():
         if verb:
             print(f'The mouse position is\nx:{x}\ny:{y}')
             return None
-        return [x,y]
+        return x,y
     
     def num_key(self, key):
         '''Convert the string corresponding to a roman number to a key code legible by the keyboard.
@@ -297,6 +300,28 @@ class Base():
         moveMouseTo(x_,y_) # Return the mouse
         return None
 
+    @staticmethod
+    def randomizeClicking(x,y):
+        '''Input the two coordinates and move each one by a small, random amount of pixels
+        in a random direction. Return the new coordinates as a pair.
+        '''
+        scale1 = random.uniform(-5,5)
+        scale2 = random.uniform(-5,5)
+        x_ = int(x + scale1)
+        y_ = int(y + scale2)
+        return x_, y_
+
+    @property
+    def char_pos(self):
+        '''Position of the character, given by two coordinates.
+        '''
+        raw_coords = self.readTextInRange(CHAR_POS_COORD)
+        if not re.match(CHAR_POS_REGEX, raw_coords):
+            raise ValueError('Could not identify the character\'s coordinates.')
+        coords_set = re.match(CHAR_POS_REGEX_EXTRACT, raw_coords)
+        coords = int(coords_set[1]), int(coords_set[2]) # x,y
+        return coords
+        
     @staticmethod
     def dist(x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)

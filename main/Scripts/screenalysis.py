@@ -6,11 +6,12 @@ from pynput.keyboard import Key, HotKey, Controller
 from pynput import mouse
 import pytesseract #Text recognition
 
-from .base import Base
-from .static import *
-from .directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from base import Base
+from static import *
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
+import random
 import time
 import math
 import sys

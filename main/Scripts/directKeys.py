@@ -71,7 +71,6 @@ def moveMouseTo(x, y):
     # convert to ctypes pixels
     # x = int(x * 0.666)
     # y = int(y * 0.666)
-    print(x, y)
     ctypes.windll.user32.SetCursorPos(x, y)
     # ctypes.windll.user32.mouse_event(2, 0, 0, 0, 0)  # left down
     # ctypes.windll.user32.mouse_event(4, 0, 0, 0, 0)  # left up
