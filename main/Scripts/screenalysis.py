@@ -2,13 +2,13 @@
 import cv2
 from PIL import ImageGrab
 from cv2 import mean #Capturing screen
-
-from base import Base
-from static import *
 from pynput.keyboard import Key, HotKey, Controller
 from pynput import mouse
 import pytesseract #Text recognition
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+
+from .base import Base
+from .static import *
+from .directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import time

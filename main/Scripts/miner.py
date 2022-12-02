@@ -2,12 +2,12 @@ from ctypes import windll
 import cv2
 from PIL import ImageGrab
 from cv2 import mean #Capturing screen
-
-from base import Base
-from static import *
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+
+from .base import Base
+from .static import *
+from .directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import re
@@ -46,7 +46,7 @@ class Miner(Base):
             return None # No node on the screen to mine (automatically throws a message)
         print('Found a node. Starting the mining process...')
         self.mining_impossible = False # Found a node
-        while self.mining_impossible is False and times_mined < 25:
+        while self.mining_impossible is False and times_mined < 35:
             self.mineOnce(node)
             if current_char_pos != self.char_pos: # Re-check character position
                 node = self.findNode()
@@ -98,8 +98,8 @@ class Miner(Base):
         if self.mining_finished: # Mining initialization failed
             print('Failed to initiate mining')
             return None
-        while self.mining_finished is False and times_checked < 20: # Wait until mining is finished
-            time.sleep(2.5) # Wait a while - maybe randomize this
+        while self.mining_finished is False and times_checked < 30: # Wait until mining is finished
+            time.sleep(2) # Wait a while - maybe randomize this
             self.updateMiningStatus() # If mining is over, set the 'mining_finished' attribute to false
             times_checked += 1
         self.useKey('Z') # Collect fallen ore
@@ -135,9 +135,9 @@ class Miner(Base):
         '''Position of the character, given by two coordinates.
         '''
         raw_coords = self.readTextInRange(CHAR_POS_COORD)
-        if not re.match(COORD_REGEX, raw_coords):
+        if not re.match(CHAR_POS_REGEX, raw_coords):
             raise ValueError('Could not identify the character\'s coordinates.')
-        coords_set = re.match(COORD_REGEX_EXTRACT, raw_coords)
+        coords_set = re.match(CHAR_POS_REGEX_EXTRACT, raw_coords)
         coords = [int(coords_set[1]), int(coords_set[2])] # [x,y]
         return coords
 
