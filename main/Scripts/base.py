@@ -315,7 +315,7 @@ class Base():
     def char_pos(self):
         '''Position of the character, given by two coordinates.
         '''
-        raw_coords = self.readTextInRange(CHAR_POS_COORD)
+        raw_coords = self.readTextInRange(CHAR_POS_COORD, view_range=True)
         if not re.match(CHAR_POS_REGEX, raw_coords):
             raise ValueError('Could not identify the character\'s coordinates.')
         coords_set = re.match(CHAR_POS_REGEX_EXTRACT, raw_coords)
