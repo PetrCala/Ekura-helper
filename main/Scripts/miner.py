@@ -4,9 +4,12 @@ from PIL import ImageGrab
 from cv2 import mean #Capturing screen
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
+import pywintypes
+import win32.win32gui as win32gui
 
 from base import Base
 from static import *
+# from main.local_settings import *
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
@@ -26,10 +29,12 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Miner(Base):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        # self.<argname> = kwargs.pop('argname') # If Miner itself ever gets an argument
         self.mining_finished = True # Boolean to indicate finished mining
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
         self.mining_timer = datetime.now() + timedelta(days = -1)
+        super(Miner, self).__init__(*args, **kwargs)
 
     def main(self):
         '''Main method of the Miner clsass
@@ -43,17 +48,21 @@ class Miner(Base):
         '''Initiate the mining process, and keep mining until there is no ore to mine.
         Return True, if mining was successful, and False, if not.
         '''
-        current_char_pos = self.char_pos
         times_mined = 0
+        # Search for the node
         print('Looking for a node to start mining...')
         node = self.findNode()
         if node is None:
             return False # No node on the screen to mine (automatically throws a message)
+        # Start the mining process
         print('Found a node. Starting the mining process...')
         self.mining_impossible = False # Found a node
         while self.mining_impossible is False and times_mined < 35:
-            self.mineOnce(node)
+            current_char_pos = self.char_pos # Update character position
+            self.mineOnce(node) # Mine
             if current_char_pos != self.char_pos: # Re-check character position
+                # Possibly insert a default, faster check, which if fails, a more
+                # extensive check should be initiated
                 node = self.findNode()
                 if node is None:
                     self.mining_impossible = True
@@ -76,7 +85,7 @@ class Miner(Base):
             return True
         if matches > 1:
             if datetime.now() - self.mining_timer < timedelta(seconds=6): # Last message had not yet disappeared
-                # print('The message had not yet disappeared... Checking again')
+                print('Waiting for the message to disappear...')
                 return False
             self.mining_finished = True
         if ore_gone > 1 or matches > 1:
@@ -92,22 +101,34 @@ class Miner(Base):
         if node is None: #Node not found on the screen
             print('Failed to find an node.')
             return None
-        return node
+        return node # [x,y]
+
+    def checkNode(self, presumed_pos:list):
+        '''Input a list of coordinates, where the node is presumed to be located.
+        Perform a narrow check for said node, and return True, if the node is still
+        at the same location. Return False otherwise.
+
+        Args:
+            presumed_pos (list): List of coordinates. 
+        '''
+        # Finish this
+        return False
 
     def mineOnce(self, node:list):
         '''Find the node on the screen and click it. After mining is done, collect the fallen ore.
         '''
         times_checked = 0
+        # Mine
         print('Initiating mining...')
         x_, y_ = self.randomizeClicking(node[0], node[1]) # Move the cursor slightly
-        self.moveClick(x_, y_) # Click the node
+        self.focusedClick(x_, y_) # Click the node
         self.mining_finished = False # Mining started
         while self.mining_finished is False and times_checked < 30: # Wait until mining is finished
             time.sleep(2) # Wait a while
             self.checkMiningFinished() # Is mining finished (or over)
             times_checked += 1
-        # Possibly refocus the game here (and return focus afterwards) to allow for mulit-tasking
-        self.useKey('Z') # Collect fallen ore
+        # Collect ore
+        self.focusedInput('Z') # Collect fallen ore
         print(f'Mining complete.')
         return None
 
@@ -129,18 +150,19 @@ class Miner(Base):
             return None
         x, y = [item[0] for item in match_list], [item[1] for item in match_list]
         x_, y_ = int(sum(x)/len(x)), int(sum(y)/len(y)) # Mean value for both coordinates
-        node = [x_, y_ + 100] #The node should be roughly 220 pixels below the node name
+        node = [x_, y_ + 100] #The node should be roughly 100 pixels below the node name
 
         print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
-        #Here try to integrate the existing camffera position, proximity to the node etc
-        return node
+        #Here try to integrate the existing camera position, proximity to the node etc
+        return node # [x, y]
 
 
 if __name__ == '__main__':
-    M = Miner()
+    M = Miner(char_name = MINER_CHAR_NAME)
     M.main()
     
 
 #Useful
 #(58, 144, 76) <- surely part of the node, 18 matches - green name
 #(146, 126, 134) <- diamond ore, possibly
+

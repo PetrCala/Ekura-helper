@@ -1,6 +1,8 @@
-﻿APP_NAME = 'Ekura miner'
+﻿# Static variables
+APP_NAME = 'Ekura miner'
+GAME_WINDOW_NAME = 'Ekura(' # Used for window name lookup
+LAUNCHER_WINDOW_NAME = 'Ekura Launcher'
 
-# Static variables
 
 # Pytesseract variables (read more here https://pypi.org/project/pytesseract/)
 # Tesseract-OCR installer at https://github.com/UB-Mannheim/tesseract/wiki
@@ -37,4 +39,8 @@ MINING_TEXT_COORD = [0.292, 0.818, 0.708, 0.919] # Message log range
 # Word lists
 MINING_DONE_KEYWORDS = ['Tvá', 'zkušenost', 'tímto', 'krumpáčem', 'potřebných', 'bodů', 'Pauzička', 'Takhle', 'říši', 'nevybudujeme']
 MINING_IMPOSSIBLE_KEYWORDS = ['Tady', 'kopat', 'nemůžeš', 'žádná', 'nenachází']
+
+
+### MOVE TO LOCAL_SETTINGS.PY LATER ###
+MINER_CHAR_NAME = 'Gintaro'
 

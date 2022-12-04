@@ -8,6 +8,7 @@ import pytesseract #Text recognition
 
 from base import Base
 from static import *
+# from main.local_settings import *
 from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
@@ -40,6 +41,8 @@ class Screenalysis(Base):
         '''
         print('Please click on the top left corner of the desired range:')
         pass
+
+
 
 
     def getPixelRGB(self):

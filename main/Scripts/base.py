@@ -4,9 +4,12 @@ from PIL import ImageGrab
 from cv2 import mean #Capturing screen
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
+import pywintypes
+import win32.win32gui as win32gui
 
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 from static import *
+# from main.local_settings import *
+from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 import numpy as np
 import random
@@ -25,12 +28,18 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Base():
-    def __init__(self):
-        pass
+    def __init__(self, char_name:str):
+        '''Constructor for the basee class
+
+        Args:
+            char_name (str): Name of the character which shall be operated by the bot.
+        '''
+        self.char_name = char_name
 
     def main(self):
         '''Main method of the Base class
         '''
+
         pass
 
     @property
@@ -218,6 +227,54 @@ class Base():
         ReleaseKey(key_hx)
         return None
 
+    def focusGame(self):
+        '''Bring the game into focus. If not open, throw a system error.
+        '''
+        lookup_words = [GAME_WINDOW_NAME, MINER_CHAR_NAME] # Game window name
+        hwnd = self.getWindowHwnd(lookup_words)
+        if hwnd is None:
+            raise SystemError('The game is not running. Start the game first')
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.2) # Allow for smoother immediate input
+        return True
+
+    def focusedInput(self, input:str, window_hwnd:int = None):
+        '''Main method for sending key input into game. Handles window focus, allows for
+        single keys, or multiple keys.
+
+        :arg:
+            input (str) - The key(s) to be pressed in game/window.
+            window_hwnd (int) - Window handle of the desired window.
+        '''
+        assert isinstance(input, str), 'The input must be a string.'
+        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
+        if window_hwnd is None:
+            self.focusGame()
+        else:
+            win32gui.SetForegroundWindow(window_hwnd)
+        if len(input) > 1:
+            self.useKeys(input)
+        else:
+            self.useKey(input)
+        win32gui.SetForegroundWindow(active_hwnd) # Return focus
+        return True
+
+    def focusedClick(self, x:int, y:int, window_hwnd:int = None):
+        '''Click with focus handling.
+
+        :arg:
+            x,y (int) - Coordinates of the click
+            window_hwnd (int) - Window handle of the desired window.
+        '''
+        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
+        if window_hwnd is None:
+            self.focusGame()
+        else:
+            win32gui.SetForegroundWindow(window_hwnd)
+        self.moveClick(x, y)
+        win32gui.SetForegroundWindow(active_hwnd) # Return focus
+        return True
+
     @staticmethod
     def checkStringForMatches(input_string:str, match_list:list, verbose:bool = False):
         '''Input a string, and a list of words to look for, and return the number
@@ -323,9 +380,35 @@ class Base():
         return coords
         
     @staticmethod
+    def getWindowHwnd(lookup_words):
+        '''Specify a window name and return its window handle. Allows regex patterns.
+        :arg:
+            lookup_words (str, or list) - Word/s that the window name must contain.
+        :return:
+            hwnd -  Handle of the said window.
+        '''
+        windows = []
+        def callback(hwnd, extra):
+            if isinstance(lookup_words, str):
+                if lookup_words in win32gui.GetWindowText(hwnd):
+                    windows.append(hwnd)
+            elif isinstance(lookup_words, list):
+                if all([word in win32gui.GetWindowText(hwnd) for word in lookup_words]):
+                    windows.append(hwnd)
+            else:
+                raise ValueError('Specify either a single or multiple words that the window should contain.')
+            return True
+        win32gui.EnumWindows(callback, None)
+        if windows == []: #Window not found
+            return None
+        elif len(windows) > 1:
+            raise ValueError('Multiple windows open.')
+        return windows[0]
+
+    @staticmethod
     def dist(x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 if __name__ == '__main__':
-    B = Base()
+    B = Base(char_name = MINER_CHAR_NAME)
     B.main()
