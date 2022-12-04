@@ -149,33 +149,37 @@ class Base():
         cv2.waitKey(0); cv2.destroyAllWindows(); cv2.waitKey(1) #Handle closing of the window
         return None
 
-    def pixelsOnScreen(self, rgb):
+    def pixelsOnScreen(self, rgb:list, range_coords:list = None):
         '''
         Enter the r,g,b value of desirable pixel values and return a list with coordinates
-            where these match on the screen.
+            where these match on the screen. Search range can be specified, defaults to whole screen.
 
         Arg:
             rgb [list] - This must be a nested list of possible rgb combinations, which should be
                 searched.
+            range_coords [list] - Range, which should be checked, given by 4 coordinates. Defaults to None,
+                in which case the whole screen is checked.
 
         Returns:
             [list]: A list of the coordinates where the match was found
         '''
         assert any(isinstance(i, list) for i in rgb), 'The argument must be a nested list'
-        print(f'Searching for pixel with rgb values from {rgb}...')
-        screen = self.createScreen(color_scale = 'orig') #Take a snapshot of the screen
-        match_count = 0
+        print(f'Searching for pixels...')
+        if range_coords is None:
+            range_coords = self.screen_pos
+        screen = self.createScreen(screen_pos = range_coords, color_scale = 'orig') #Take a snapshot of the range/screen
         match_list = []
+        width = range_coords[2] - range_coords[0]
+        length = range_coords[3] - range_coords[1]
         start_time = time.time()
-        for y in range(self.screen_size[1]):
-            for x in range(self.screen_size[0]):
+        for y in range(length - 1): # Last subscript is out of bounds -> don't check it
+            for x in range(width - 1):
                 pixel_rgb = screen[y,x].tolist()
                 if pixel_rgb in rgb:
-                    match_count = match_count + 1
-                    # print(f'Found a match at position ({x}, {y})')
                     match_list.append([x,y])
         search_time = round(time.time() - start_time, 2)
-        print(f'Search complete.\nFound {match_count} matching pixels.\nThe search took {search_time} seconds.')
+        match_count = len(match_list)
+        print(f'Found {match_count} matching pixels.\nThe search took {search_time} seconds.')
         return match_list
 
     def getMousePosition(self, scale = False, verb = False):

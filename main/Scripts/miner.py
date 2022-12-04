@@ -58,12 +58,10 @@ class Miner(Base):
         print('Found a node. Starting the mining process...')
         self.mining_impossible = False # Found a node
         while self.mining_impossible is False and times_mined < 35:
-            current_char_pos = self.char_pos # Update character position
             self.mineOnce(node) # Mine
-            if current_char_pos != self.char_pos: # Re-check character position
-                # Possibly insert a default, faster check, which if fails, a more
-                # extensive check should be initiated
-                node = self.findNode()
+            node_unmoved = self.checkNode(node) # Fast check
+            if not node_unmoved: # Node/camera position was changed
+                node = self.findNode() # Screen-wide check
                 if node is None:
                     self.mining_impossible = True
                     break
@@ -111,7 +109,20 @@ class Miner(Base):
         Args:
             presumed_pos (list): List of coordinates. 
         '''
-        # Finish this
+        y_offset = 100 # Node located approximately this many pixels below text
+        x_width = 50 # Search area pixels - x axis 
+        y_width = 30 # Search area pixels - y axis 
+        # Specify the check range
+        x_, y_ = presumed_pos[0], presumed_pos[1] - y_offset
+        range_coords = [int(x_ - x_width/2), int(y_ - y_width/2), int(x_ + x_width/2), int(y_ + y_width/2)]
+        # Check said range
+        match_list = self.pixelsOnScreen(NODE_PIXELS, range_coords) # Node position check
+        matched_pixels = len(match_list)
+        # Decide whether or not the node is present
+        if matched_pixels > 10: # Arbitrary number
+            print('The node is still there. Mine away.')
+            return True
+        print('The node could not be found, you should conduct a wider search.')
         return False
 
     def mineOnce(self, node:list):
@@ -148,9 +159,10 @@ class Miner(Base):
         if match_list == []:
             print('The node location could not be calculated. There are no matching pixels on the screen.')
             return None
+        y_offset = 100 # Rough estimate of how many pixels below the text the node is located
         x, y = [item[0] for item in match_list], [item[1] for item in match_list]
         x_, y_ = int(sum(x)/len(x)), int(sum(y)/len(y)) # Mean value for both coordinates
-        node = [x_, y_ + 100] #The node should be roughly 100 pixels below the node name
+        node = [x_, y_ + y_offset] # Offest Y
 
         print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
         #Here try to integrate the existing camera position, proximity to the node etc
