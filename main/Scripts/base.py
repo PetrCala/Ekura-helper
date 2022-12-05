@@ -46,7 +46,7 @@ class Base():
             overriding when input needs to be sent to a different window (such as
             when logging in).
         '''
-        pos = self.getGameCoords() # Throws an error if game is not running
+        pos = self.getWindowCoords() # Throws an error if game is not running
         return pos
 
     @property
@@ -276,10 +276,15 @@ class Base():
             raise SystemError('The game is not running. Start the game first')
         return hwnd
 
-    def getGameCoords(self):
+    def getWindowCoords(self, hwnd:int = None):
         '''Return the coordinates of the game window as a list of 4 coordinates.
+
+        :arg:
+            hwnd (int) - Handle number of the window to assess. Defaults to None,
+                in which case the main game window is used.
         '''
-        hwnd = self.getGameHwnd()
+        if hwnd is None:
+            hwnd = self.getGameHwnd()
         pos = win32gui.GetWindowPlacement(hwnd)
         return list(pos[4])
 

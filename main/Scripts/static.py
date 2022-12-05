@@ -2,6 +2,7 @@
 APP_NAME = 'Ekura miner'
 GAME_WINDOW_NAME = 'Ekura(' # Used for window name lookup
 LAUNCHER_WINDOW_NAME = 'Ekura Launcher'
+LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
 
 
 # Pytesseract variables (read more here https://pypi.org/project/pytesseract/)
@@ -32,10 +33,16 @@ NODE_PIXELS = [[46, 115, 61], [65, 162, 85], [89, 220, 116], [89, 222, 117], [84
 CHAR_POS_REGEX = r'\(\d+,\ ?\d+\)'
 CHAR_POS_REGEX_EXTRACT = r'\((.*),\ ?(.*)\)'
 
-# Coordinates
+# Game window coordinates
 CHAR_POS_COORD = [0.936, 0.209, 0.979, 0.230] # Character position
 MINING_TEXT_COORD = [0.292, 0.818, 0.708, 0.919] # Message log range
 VALIDATION_COORDS = [CHAR_POS_COORD, MINING_TEXT_COORD] # Used in game position validation
+
+# Game launcher window coordinates
+LOGIN_NAME_COORD = [0.530, 0.715]
+LOGIN_PW_COORD = [0.530, 0.785]
+LOGIN_START_COORD = [0.530, 0.860]
+
 
 # Word lists
 MINING_DONE_KEYWORDS = ['Tvá', 'zkušenost', 'tímto', 'krumpáčem', 'potřebných', 'bodů', 'Pauzička', 'Takhle', 'říši', 'nevybudujeme']
