@@ -13,4 +13,5 @@ Written on version of Python 3.9.7.
 ## Notes
 * The scripts require the game to be open in order to send inputs. The game must be ran at a window visible to the human eye at all times.
 * Supported platforms: Windows
+* Supported resolution: 1920x1080 pixels
 

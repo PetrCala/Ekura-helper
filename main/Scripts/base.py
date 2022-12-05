@@ -35,12 +35,21 @@ class Base():
             char_name (str): Name of the character which shall be operated by the bot.
         '''
         self.char_name = char_name
+        self.validateGamePos() # Verify that the game can be located
 
     def main(self):
         '''Main method of the Base class
         '''
-
         pass
+
+    @property
+    def screen_pos(self):
+        '''
+        Return a list of 4 coordinates marking the beginning and end of the screen
+            in the form [x1,y1, x2, y2].
+        '''
+        pos = self.getGameCoords() # Throws an error if game is not running
+        return pos
 
     @property
     def numbers(self):
@@ -66,14 +75,43 @@ class Base():
         if not len(coords) == 2:
             raise ValueError('The coordinates must be input as a list of length 2')
         x_inp, y_inp = coords
-        screen_width, screen_height = self.screen_size
+        current_screen = self.screen_pos
+        screen_width = current_screen[2] - current_screen[0]
+        screen_height = current_screen[3] - current_screen[1]
         if from_scale:
-            x = int(screen_width * x_inp) # Distance from left bound - x axis
-            y = int(screen_height * y_inp) # Distance from upper bound - y axis
+            # Take left/top edge, and add the desired distance (percentage of screen) to get coord
+            x = int(current_screen[0] + screen_width * x_inp) # x axis
+            y = int(current_screen[1] + screen_height * y_inp) # y axis
         else:
-            x = round(x_inp/screen_width, 3)
-            y = round(y_inp/screen_height, 3)
+            # Take pixels from edge to coord, then calculate what percentage of screen
+            # that distance covers
+            x = round((x_inp - current_screen[0])/screen_width, 3)
+            y = round((y_inp - current_screen[1])/screen_height, 3)
         return [x, y]
+
+    def validateGamePos(self):
+        '''Check that the game window is in a position where all important inputs can be read.
+        '''
+        print('Validating game position...')
+        start_time = time.time()
+        screen_pos = self.screen_pos # Actual game position
+        monitor_pos = self.monitor_coords # Monitor position
+        x_verify, y_verify = [], [] # Coordinates to be verified
+        for coords in ALL_COORDS:
+            x_verify = x_verify + [coords[0], coords[2]]
+            y_verify = y_verify + [coords[1], coords[3]]
+        # Absolute coordinates       
+        x_abs = [self.calculateCoords([coord,0])[0] for coord in x_verify]
+        y_abs = [self.calculateCoords([0,coord])[1] for coord in y_verify]
+        # Check if all coordinates are valid
+        x_valid = all([monitor_pos[0] < coord < monitor_pos[2] for coord in x_abs])
+        y_valid = all([monitor_pos[1] < coord < monitor_pos[3] for coord in y_abs])
+        if not x_valid and y_valid:
+            raise SystemError('Some crucial parts of the game window are hidden. Please recenter the game window.')
+        # Possibly move the game automatically to a pre-defined location, if it makes more sense
+        validation_time = round(time.time() - start_time, 2)
+        print(f'The game position is valid. The validation took {validation_time} seconds.')
+        return True
 
     def rangeToPixels(self, range:list):
         '''Specify a list of 4 scale coordinates and return a list of four points,
@@ -231,13 +269,26 @@ class Base():
         ReleaseKey(key_hx)
         return None
 
-    def focusGame(self):
-        '''Bring the game into focus. If not open, throw a system error.
+    def getGameHwnd(self):
+        '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
         lookup_words = [GAME_WINDOW_NAME, MINER_CHAR_NAME] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')
+        return hwnd
+
+    def getGameCoords(self):
+        '''Return the coordinates of the game window as a list of 4 coordinates.
+        '''
+        hwnd = self.getGameHwnd()
+        pos = win32gui.GetWindowPlacement(hwnd)
+        return list(pos[4])
+
+    def focusGame(self):
+        '''Bring the game into focus.
+        '''
+        hwnd = self.getGameHwnd() # Automatically raises error if not found.
         win32gui.SetForegroundWindow(hwnd)
         time.sleep(0.2) # Allow for smoother immediate input
         return True
@@ -318,10 +369,8 @@ class Base():
         return True if on_screen else False
 
     @classproperty
-    def screen_pos(cls):
-        '''
-        Return a list of 4 coordinates marking the beginning and end of the screen
-            in the form [x1,y1, x2, y2].
+    def monitor_coords(cls):
+        '''Coordinates of the monitor, which the game is allowed to be ran on.
         '''
         return [0,0] + cls.screen_size
 
