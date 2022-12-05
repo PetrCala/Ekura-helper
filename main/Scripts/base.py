@@ -28,14 +28,10 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Base():
-    def __init__(self, char_name:str):
-        '''Constructor for the basee class
-
-        Args:
-            char_name (str): Name of the character which shall be operated by the bot.
+    def __init__(self):
+        '''Constructor for the base class.
         '''
-        self.char_name = char_name
-        self.validateGamePos() # Verify that the game can be located
+        pass
 
     def main(self):
         '''Main method of the Base class
@@ -46,7 +42,9 @@ class Base():
     def screen_pos(self):
         '''
         Return a list of 4 coordinates marking the beginning and end of the screen
-            in the form [x1,y1, x2, y2].
+            in the form [x1,y1, x2, y2]. Specified as a property in order to allow
+            overriding when input needs to be sent to a different window (such as
+            when logging in).
         '''
         pos = self.getGameCoords() # Throws an error if game is not running
         return pos
@@ -97,7 +95,7 @@ class Base():
         screen_pos = self.screen_pos # Actual game position
         monitor_pos = self.monitor_coords # Monitor position
         x_verify, y_verify = [], [] # Coordinates to be verified
-        for coords in ALL_COORDS:
+        for coords in VALIDATION_COORDS:
             x_verify = x_verify + [coords[0], coords[2]]
             y_verify = y_verify + [coords[1], coords[3]]
         # Absolute coordinates       
@@ -463,5 +461,5 @@ class Base():
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 if __name__ == '__main__':
-    B = Base(char_name = MINER_CHAR_NAME)
+    B = Base()
     B.main()

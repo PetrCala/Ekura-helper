@@ -29,12 +29,21 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Miner(Base):
-    def __init__(self, *args, **kwargs):
-        # self.<argname> = kwargs.pop('argname') # If Miner itself ever gets an argument
+    def __init__(self, char_name:str, *args, **kwargs):
+        '''Constructor for the Miner class.
+
+        Args:
+            char_name (str): Name of the character which shall be operated by the bot.
+        '''
+        # Variables
+        self.char_name = char_name
+        # Attributes
         self.mining_finished = True # Boolean to indicate finished mining
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
         self.mining_timer = datetime.now() + timedelta(days = -1)
-        super(Miner, self).__init__(*args, **kwargs)
+        # Constructor operations
+        super(Miner, self).__init__(*args, **kwargs) # Master class inheritance
+        self.validateGamePos() # Verify that the game can be located
 
     def main(self):
         '''Main method of the Miner clsass
@@ -177,4 +186,5 @@ if __name__ == '__main__':
 #Useful
 #(58, 144, 76) <- surely part of the node, 18 matches - green name
 #(146, 126, 134) <- diamond ore, possibly
+
 
