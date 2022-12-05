@@ -35,7 +35,7 @@ CHAR_POS_REGEX_EXTRACT = r'\((.*),\ ?(.*)\)'
 
 # Game window coordinates
 CHAR_POS_COORD = [0.936, 0.209, 0.979, 0.230] # Character position
-MINING_TEXT_COORD = [0.292, 0.818, 0.708, 0.919] # Message log range
+MINING_TEXT_COORD = [0.292, 0.800, 0.708, 0.953] # Message log range
 VALIDATION_COORDS = [CHAR_POS_COORD, MINING_TEXT_COORD] # Used in game position validation
 
 # Game launcher window coordinates

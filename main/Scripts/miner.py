@@ -91,7 +91,7 @@ class Miner(Base):
             self.mining_finished = True
             return True
         if matches > 1:
-            if (datetime.now() - self.mining_timer) < timedelta(seconds=6): # Last message had not yet disappeared
+            if (datetime.now() - self.mining_timer) < timedelta(seconds=8): # Last message had not yet disappeared
                 print('Waiting for the message to disappear...')
                 return False
             self.mining_finished = True

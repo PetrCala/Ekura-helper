@@ -31,6 +31,8 @@ keyboard = Controller()
 def main():
     M = Miner(char_name = MINER_CHAR_NAME)
     M.main()
+    # read = M.readTextInRange(MINING_TEXT_COORD)
+    # print(read)
 
 
 
