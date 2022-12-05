@@ -394,10 +394,10 @@ class Base():
         windows = []
         def callback(hwnd, extra):
             if isinstance(lookup_words, str):
-                if lookup_words in win32gui.GetWindowText(hwnd):
+                if lookup_words.upper() in win32gui.GetWindowText(hwnd).upper():
                     windows.append(hwnd)
             elif isinstance(lookup_words, list):
-                if all([word in win32gui.GetWindowText(hwnd) for word in lookup_words]):
+                if all([word.upper() in win32gui.GetWindowText(hwnd).upper() for word in lookup_words]):
                     windows.append(hwnd)
             else:
                 raise ValueError('Specify either a single or multiple words that the window should contain.')
