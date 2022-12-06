@@ -33,10 +33,13 @@ class Launcher(Base):
         pass
 
     def main(self):
-        coords = self.getLauncherCoords()
-        mouse_pos = self.getMousePosition()
-        launcher_coords = self.calculateCoords(mouse_pos, from_scale = False)
-        print(launcher_coords) # Get launcher window coordinates
+        # coords = self.getLauncherCoords()
+        # mouse_pos = self.getMousePosition()
+        # launcher_coords = self.calculateCoords(mouse_pos, from_scale = False)
+        # print(launcher_coords) # Get launcher window coordinates
+        # self.login()
+        self.openGameLauncher()
+
         pass
 
     @property
@@ -57,9 +60,22 @@ class Launcher(Base):
         return self.getWindowCoords(hwnd)
 
     def openGameLauncher(self):
-        '''Open the game launcher, if not open already.
+        '''Open the game launcher.
         '''
-        # Finish this
+        self.useKey(Key.cmd, sleep = 0.2)
+        self.useKeys(LAUNCHER_APP_NAME, sleep_after=0.3) # Write the game launcher name
+        self.useKey(Key.enter, sleep = 0.9)
+        tries = 0 # Placeholder for the upper limit on the window opening wait time
+        hwnd = self.getLauncherHwnd()
+        while hwnd is None and tries < 20: # Requires manual input for the UAC
+            time.sleep(0.5) # Wait for the window to open
+            hwnd = self.getLauncherHwnd()
+            tries += 1
+        if hwnd is None:
+            print('Could not open the launcher window')
+            return False
+        time.sleep(2) # Wait for the launcher animations to finish
+        print('Launcher open')
         return True
 
     def closeGameLauncher(self):
@@ -71,13 +87,28 @@ class Launcher(Base):
         win32gui.CloseWindow(hwnd)
         return True
 
+    def inputName(self):
+        '''Input the character name into the game launcher. Assumer the launcher is
+        already open.
+        '''
+        pass
+
+    def inputPassword(self):
+        '''Input the character password into the game launcher. Assumer the launcher is
+        already open.
+        '''
+        pass
+
+
     def login(self):
         '''Input the name, password, and start the game. The game launcher window
         must be open already.
         '''
         if not self.checkLauncherOpen():
             self.openGameLauncher()
-        # Finish this
+        self.inputName()
+        self.inputPassword()
+        self.useKey(Key.enter, sleep = False) # Press 'start game' (may be changed to click)
         return True
 
     def checkLauncherOpen(self):

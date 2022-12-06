@@ -29,8 +29,23 @@ keyboard = Controller()
 
 
 def main():
-    M = Miner(char_name = MINER_CHAR_NAME)
-    M.main()
+    # M = Miner(char_name = MINER_CHAR_NAME)
+    # M.main()
+    B = Base()
+    timer = 0
+    b = 1
+    print(b)
+    def check(a):
+        return a == 2
+    while check(b) and timer < 15:
+        print('still no true')
+        time.sleep(0.2)
+        timer += 1
+        if timer == 5:
+            b = 2
+
+
+
     # read = M.readTextInRange(MINING_TEXT_COORD)
     # print(read)
 

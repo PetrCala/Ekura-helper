@@ -18,6 +18,7 @@ import re
 import time
 import math
 import sys
+import os
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
@@ -243,19 +244,46 @@ class Base():
             raise ValueError('Only roman numbers can be converted.')
         return keyboard._KeyCode(char = key)
         
-    def useKeys(self, keys):
+    def useKey(self, key, method:str = 'tap', sleep:bool = True):
+            '''An extended method for handling more complex key pressing. Used to input only one key.
+
+            :arg:
+                key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
+                method[str] - Method by which the key shall be used. Must be an attribute of the keyboard.
+                sleep[bool] - If true, insert a 0.2 sleep time after the key press. Defaults to True.
+            '''
+            if not hasattr(keyboard, method):
+                raise ValueError('You are trying to perform an invalid operation on the keyboard.')
+            if key in self.numbers:
+                key = self.num_key(key) #Parse a roman number
+            getattr(keyboard, method)(key) #Tap, press,... the key
+            if sleep:
+                period = 0.7 if sleep is True else sleep
+                time.sleep(period)
+            return None
+
+    def useKeys(self, keys, sleep = False, sleep_after = False):
         '''For each key in keys, press this key. Keys can be any iterable object.
+        :arg:
+            keys - Keys to be pressed/written.
+            sleep (bool) - If True, insert a small wait time in between key presses.
+                Also accepts float, which specifies the wait time. Defaults to False.
+            sleep_after (bool) - Similar to sleep, only for the sleep timer after all
+                keys were pressed.
         '''
         for key in keys:
-            self.useKey(key)
-        return None
+            self.useKey(key, sleep = sleep)
+        if sleep_after:
+            period = 0.7 if sleep_after is True else sleep_after
+            time.sleep(period)
+        return True
 
-    def useKey(self, key):
-        '''An extended method for handling more complex key pressing.
+    def useKeyInGame(self, key):
+        '''Press a key using the directKeys script. Used for a more reliable key pressing in game. Unsuitable for
+        longer text input outside of game.
+
         :args:
             key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
-            method[str] - Method by which the key shall be used. Must be an attribute of the keyboard.
-            sleep[bool] - If true, insert a 0.2 sleep time after the key press. Defaults to True.
         '''
         if not key in KEYS.keys():
             raise ValueError('This key cannot be pressed')
@@ -266,6 +294,13 @@ class Base():
         time.sleep(1)
         ReleaseKey(key_hx)
         return None
+
+    def useKeysInGame(self, keys, sleep = False):
+        '''For each key in keys, press this key in game.
+        By default, insert no sleep time in between key presses.
+        '''
+        for key in keys:
+            self.useKeyInGame(key, sleep = sleep)
 
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
@@ -311,9 +346,9 @@ class Base():
         else:
             win32gui.SetForegroundWindow(window_hwnd)
         if len(input) > 1:
-            self.useKeys(input)
+            self.useKeysInGame(input)
         else:
-            self.useKey(input)
+            self.useKeyInGame(input)
         win32gui.SetForegroundWindow(active_hwnd) # Return focus
         return True
 
