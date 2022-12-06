@@ -1,4 +1,4 @@
-# Ekura miner
+# Ekura helper
 A simple Python project for automatization of various tasks in an MMORPG, including mining, inventory management, farming, fishing, etc.
 
 Written on version of Python 3.9.7.
