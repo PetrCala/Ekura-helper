@@ -1,4 +1,12 @@
-﻿from ctypes import windll
+﻿import numpy as np
+import random
+from datetime import datetime, timedelta
+import re
+import time
+import math
+import sys
+
+from ctypes import windll
 import cv2
 from PIL import ImageGrab
 from cv2 import mean #Capturing screen
@@ -7,21 +15,12 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from static import *
-# from main.local_settings import *
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
-
-import numpy as np
-import random
-from datetime import datetime, timedelta
-import re
-import time
-import math
-import sys
-import os
+from ekura_helper.tools import static
+from ekura_helper.tools import local_settings
+from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
 class classproperty(property):
@@ -96,7 +95,7 @@ class Base():
         screen_pos = self.screen_pos # Actual game position
         monitor_pos = self.monitor_coords # Monitor position
         x_verify, y_verify = [], [] # Coordinates to be verified
-        for coords in VALIDATION_COORDS:
+        for coords in static.VALIDATION_COORDS:
             x_verify = x_verify + [coords[0], coords[2]]
             y_verify = y_verify + [coords[1], coords[3]]
         # Absolute coordinates       
@@ -141,7 +140,7 @@ class Base():
         img = self.createScreen(range_pixels, color_scale='orig')
         if view_range:
             self.openScreen(range_pixels, color_scale = 'orig')
-        return pytesseract.image_to_string(img, lang = lang, config = TESSDATA_DIR_CONFIG)
+        return pytesseract.image_to_string(img, lang = lang, config = static.TESSDATA_DIR_CONFIG)
 
     def createScreen(self, screen_pos:list = None, color_scale = 'gray'):
         '''Return a numpy array representing pixels on a screen. Specify the range
@@ -285,11 +284,11 @@ class Base():
         :args:
             key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
         '''
-        if not key in KEYS.keys():
+        if not key in static.KEYS.keys():
             raise ValueError('This key cannot be pressed')
         if key in self.numbers:
             key = self.num_key(key) #Parse a roman number
-        key_hx = KEYS.get(key) 
+        key_hx = static.KEYS.get(key) 
         PressKey(key_hx)
         time.sleep(1)
         ReleaseKey(key_hx)
@@ -305,7 +304,7 @@ class Base():
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
-        lookup_words = [GAME_WINDOW_NAME, MINER_CHAR_NAME] # Game window name
+        lookup_words = [static.GAME_WINDOW_NAME, static.MINER_CHAR_NAME] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')
@@ -463,10 +462,10 @@ class Base():
     def char_pos(self):
         '''Position of the character, given by two coordinates.
         '''
-        raw_coords = self.readTextInRange(CHAR_POS_COORD)
-        if not re.match(CHAR_POS_REGEX, raw_coords):
+        raw_coords = self.readTextInRange(static.CHAR_POS_COORD)
+        if not re.match(static.CHAR_POS_REGEX, raw_coords):
             raise ValueError('Could not identify the character\'s coordinates.')
-        coords_set = re.match(CHAR_POS_REGEX_EXTRACT, raw_coords)
+        coords_set = re.match(static.CHAR_POS_REGEX_EXTRACT, raw_coords)
         coords = int(coords_set[1]), int(coords_set[2]) # x,y
         return coords
         

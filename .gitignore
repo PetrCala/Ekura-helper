@@ -1,3 +1,13 @@
-venv/
+# Python temp files
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Build files and venv
+build/
+dist/
+*.egg-info/
+venv/
+
+# Custom files
 notes.txt

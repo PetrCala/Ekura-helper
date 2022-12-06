@@ -1,4 +1,12 @@
-﻿from ctypes import windll
+﻿import numpy as np
+import random
+from datetime import datetime, timedelta
+import re
+import time
+import math
+import sys
+
+from ctypes import windll
 import cv2
 from PIL import ImageGrab
 from cv2 import mean #Capturing screen
@@ -7,21 +15,13 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from base import Base
-from static import *
-# from main.local_settings import *
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
-
-import numpy as np
-import random
-from datetime import datetime, timedelta
-import re
-import time
-import math
-import sys
+from ekura_helper.scripts.base import Base
+from ekura_helper.tools import static
+from ekura_helper.tools import local_settings
+from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
 class classproperty(property):
@@ -51,7 +51,7 @@ class Launcher(Base):
     def getLauncherHwnd(self):
         '''Get window handle number of the game launcher window.
         '''
-        return self.getWindowHwnd(LAUNCHER_WINDOW_NAME)
+        return self.getWindowHwnd(static.LAUNCHER_WINDOW_NAME)
 
     def getLauncherCoords(self):
         '''Get coordinates of the game launcher window.
@@ -63,7 +63,7 @@ class Launcher(Base):
         '''Open the game launcher.
         '''
         self.useKey(Key.cmd, sleep = 0.2)
-        self.useKeys(LAUNCHER_APP_NAME, sleep_after=0.3) # Write the game launcher name
+        self.useKeys(static.LAUNCHER_APP_NAME, sleep_after=0.3) # Write the game launcher name
         self.useKey(Key.enter, sleep = 0.9)
         tries = 0 # Placeholder for the upper limit on the window opening wait time
         hwnd = self.getLauncherHwnd()
@@ -99,7 +99,6 @@ class Launcher(Base):
         '''
         pass
 
-
     def login(self):
         '''Input the name, password, and start the game. The game launcher window
         must be open already.
@@ -120,7 +119,6 @@ class Launcher(Base):
             return False
         return True
         
-
 if __name__ == '__main__':
     L = Launcher()
     L.main()

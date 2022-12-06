@@ -1,1 +1,0 @@
-﻿TEST_VAR = 'hello, test'

@@ -10,19 +10,6 @@ LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
 PYTESSERACT_PATH = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract' # 'tesseract' app in the Tesseract-OCR 
 TESSDATA_DIR_CONFIG = r'--tessdata-dir "C:\\Program Files (x86)\\Tesseract-OCR\\tessdata"' # "tessdata" folder in the Tesseract-OCR
 
-### KEYS ###
-KEYS = {
-    'A':0x1E,
-    'C':0x2E,
-    'D':0x20,
-    'I':0x17,
-    'K':0x25,
-    'M':0x32,
-    'S':0x1F,
-    'W':0x11,
-    'Z':0x2C,
-    'SPACE':0x39,
-}
 
 ### MINING PROCESS ###
 
@@ -52,6 +39,16 @@ MINING_DONE_KEYWORDS = ['Tvá', 'zkušenost', 'tímto', 'krumpáčem', 'potřebn
 MINING_IMPOSSIBLE_KEYWORDS = ['Tady', 'kopat', 'nemůžeš', 'žádná', 'nenachází']
 
 
-### MOVE TO LOCAL_SETTINGS.PY LATER ###
-MINER_CHAR_NAME = 'Gintaro'
-
+### KEYS ###
+KEYS = {
+    'A':0x1E,
+    'C':0x2E,
+    'D':0x20,
+    'I':0x17,
+    'K':0x25,
+    'M':0x32,
+    'S':0x1F,
+    'W':0x11,
+    'Z':0x2C,
+    'SPACE':0x39,
+}

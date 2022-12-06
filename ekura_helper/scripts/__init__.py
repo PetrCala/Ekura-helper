@@ -1,0 +1,1 @@
+from ekura_helper.tools import static

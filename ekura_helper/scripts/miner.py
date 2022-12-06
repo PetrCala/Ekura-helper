@@ -1,3 +1,11 @@
+import numpy as np
+import random
+from datetime import datetime, timedelta
+import re
+import time
+import math
+import sys
+
 from ctypes import windll
 import cv2
 from PIL import ImageGrab
@@ -7,21 +15,13 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from base import Base
-from static import *
-# from main.local_settings import *
-from directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
-
-import numpy as np
-import random
-from datetime import datetime, timedelta
-import re
-import time
-import math
-import sys
+from ekura_helper.scripts.base import Base
+from ekura_helper.tools import static
+from ekura_helper.tools import local_settings
+from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
 class classproperty(property):
@@ -82,9 +82,9 @@ class Miner(Base):
         '''Check whether the mining has yet finished. If so, set the 'mining_finished'
         attribute to True. Return True, if mining is finished, and False otherwise.
         '''
-        msg = self.readTextInRange(MINING_TEXT_COORD, view_range = False) # Read message log
-        ore_gone = self.checkStringForMatches(msg, MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
-        matches = self.checkStringForMatches(msg, MINING_DONE_KEYWORDS, verbose = False)
+        msg = self.readTextInRange(static.MINING_TEXT_COORD, view_range = False) # Read message log
+        ore_gone = self.checkStringForMatches(msg, static.MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
+        matches = self.checkStringForMatches(msg, static.MINING_DONE_KEYWORDS, verbose = False)
         if ore_gone > 1: # Check whether the node had not disappeared yet
             print('The node has disappeared...')
             self.mining_impossible = True
@@ -103,7 +103,7 @@ class Miner(Base):
     def findNode(self):
         '''Return a list of coordinates, if node is present on the screen. Return False otherwise.
         '''
-        match_list = self.pixelsOnScreen(NODE_PIXELS) #Searching for node name
+        match_list = self.pixelsOnScreen(static.NODE_PIXELS) #Searching for node name
         node = self.calculateNodePosition(match_list) #Approximating the node position
         if node is None: #Node not found on the screen
             print('Failed to find an node.')
@@ -125,7 +125,7 @@ class Miner(Base):
         x_, y_ = presumed_pos[0], presumed_pos[1] - y_offset
         range_coords = [int(x_ - x_width/2), int(y_ - y_width/2), int(x_ + x_width/2), int(y_ + y_width/2)]
         # Check said range
-        match_list = self.pixelsOnScreen(NODE_PIXELS, range_coords) # Node position check
+        match_list = self.pixelsOnScreen(static.NODE_PIXELS, range_coords) # Node position check
         matched_pixels = len(match_list)
         # Decide whether or not the node is present
         if matched_pixels > 10: # Arbitrary number
@@ -179,7 +179,7 @@ class Miner(Base):
 
 
 if __name__ == '__main__':
-    M = Miner(char_name = MINER_CHAR_NAME)
+    M = Miner(char_name = local_settings.MINER_CHAR_NAME)
     M.main()
     
 
