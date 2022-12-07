@@ -30,7 +30,8 @@ class classproperty(property):
 
 class Miner(Base):
     def __init__(self, char_name:str, *args, **kwargs):
-        '''Constructor for the Miner class.
+        '''Constructor for the Miner class. Game must be running in order for the
+            constructor to be callable.
 
         Args:
             char_name (str): Name of the character which shall be operated by the bot.
@@ -38,6 +39,7 @@ class Miner(Base):
         # Variables
         self.char_name = char_name
         # Attributes
+        self.screen_pos = self.getWindowCoords() # Function defaults to game window
         self.mining_finished = True # Boolean to indicate finished mining
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
         self.mining_timer = datetime.now() + timedelta(days = -1)
@@ -143,7 +145,7 @@ class Miner(Base):
         x_, y_ = self.randomizeClicking(node[0], node[1]) # Move the cursor slightly
         self.focusedClick(x_, y_) # Click the node
         self.mining_finished = False # Mining started
-        while self.mining_finished is False and times_checked < 30: # Wait until mining is finished
+        while self.mining_finished is False and times_checked < 22: # Wait until mining is finished
             time.sleep(2) # Wait a while
             self.checkMiningFinished() # Is mining finished (or over)
             times_checked += 1

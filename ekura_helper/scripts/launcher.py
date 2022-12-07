@@ -30,23 +30,12 @@ class classproperty(property):
 
 class Launcher(Base):
     def __init__(self):
+        self.screen_pos = self.getLauncherCoords() # Launcher window
         pass
 
     def main(self):
-        # coords = self.getLauncherCoords()
-        # mouse_pos = self.getMousePosition()
-        # launcher_coords = self.calculateCoords(mouse_pos, from_scale = False)
-        # print(launcher_coords) # Get launcher window coordinates
-        # self.login()
-        self.openGameLauncher()
-
+        # self.openGameLauncher()
         pass
-
-    @property
-    def screen_pos(self):
-        '''Change operation window to the game launcher window.
-        '''
-        return self.getLauncherCoords()
 
     def getLauncherHwnd(self):
         '''Get window handle number of the game launcher window.
@@ -75,6 +64,7 @@ class Launcher(Base):
             print('Could not open the launcher window')
             return False
         time.sleep(2) # Wait for the launcher animations to finish
+        win32gui.MoveWindow(hwnd) # Center the window
         print('Launcher open')
         return True
 
@@ -87,10 +77,17 @@ class Launcher(Base):
         win32gui.CloseWindow(hwnd)
         return True
 
+    def defaultNameEntered(self):
+        '''Check whether there is not already a name input by default.
+        If yes, return this name, if not, return False.
+        '''
+        pass
+
     def inputName(self):
         '''Input the character name into the game launcher. Assumer the launcher is
         already open.
         '''
+        
         pass
 
     def inputPassword(self):

@@ -28,10 +28,14 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Base():
-    def __init__(self):
+    def __init__(self, hwnd:int = None):
         '''Constructor for the base class.
+        :arg:
+            hwnd(int) - Handle of the window, which shall be the default view
+                window if the class. Defaults to None, in which case the whole
+                monitor is used.
         '''
-        pass
+        self.screen_pos = self.monitor_coords if hwnd is None else self.getWindowCoords(hwnd) 
 
     def main(self):
         '''Main method of the Base class
@@ -39,23 +43,12 @@ class Base():
         pass
 
     @property
-    def screen_pos(self):
-        '''
-        Return a list of 4 coordinates marking the beginning and end of the screen
-            in the form [x1,y1, x2, y2]. Specified as a property in order to allow
-            overriding when input needs to be sent to a different window (such as
-            when logging in).
-        '''
-        pos = self.getWindowCoords() # Throws an error if game is not running
-        return pos
-
-    @property
     def numbers(self):
         '''A list of the 10 roman numbers as strings. Used for keyboard input.
         '''
         return [str(i) for i in range(11)]
 
-    def calculateCoords(self, coords:list, from_scale = True):
+    def calculateCoords(self, coords:list, from_scale:bool = True):
         '''Input a list of scale coordinates and return a list of the actual coordinates
         for the user's screen. It is possible to calculate in reverse direction too.
         :args:
