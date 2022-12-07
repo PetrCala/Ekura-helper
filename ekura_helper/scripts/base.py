@@ -48,7 +48,7 @@ class Base():
         '''
         return [str(i) for i in range(11)]
 
-    def calculateCoords(self, coords:list, from_scale:bool = True):
+    def calculateCoords(self, coords:list, from_scale:bool = True, screen_pos_:list = None):
         '''Input a list of scale coordinates and return a list of the actual coordinates
         for the user's screen. It is possible to calculate in reverse direction too.
         :args:
@@ -56,6 +56,9 @@ class Base():
                 the screen.
             from_scale[bool, optional] - If True, input scale coordinates and return the actual
                 coordinates on user's screen. If False, do the inverse. Defaults to True.
+            screen_pos_[list, opional] - List of coordinates, indicating the screen, for which
+                the calculation should be done. Defaults to None, in which case the screen_pos
+                attribute of the last class is used.
             
         :note:
             Scale coordinates - An initial point of [0.5,0.5] marks a point in the middle of the screen.
@@ -66,7 +69,7 @@ class Base():
         if not len(coords) == 2:
             raise ValueError('The coordinates must be input as a list of length 2')
         x_inp, y_inp = coords
-        current_screen = self.screen_pos
+        current_screen = self.screen_pos if screen_pos_ is None else screen_pos_ 
         screen_width = current_screen[2] - current_screen[0]
         screen_height = current_screen[3] - current_screen[1]
         if from_scale:

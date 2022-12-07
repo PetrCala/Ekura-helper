@@ -31,7 +31,7 @@ LAUNCHER_PW_COORD = [0.530, 0.785]
 LAUNCHER_START_COORD = [0.530, 0.860]
 
 # Monitor coordinates
-LAUNCHER_DEFAULT_COORD = [0.233, 0.245, 0.660, 0.616] # Default coordinates of the launcher, in terms of monitor size
+MONITOR_LAUNCHER_DEFAULT_COORD = [0.233, 0.245, 0.660, 0.616] # Default coordinates of the launcher, in terms of monitor size
 
 
 

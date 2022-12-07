@@ -20,7 +20,7 @@ keyboard = Controller()
 
 def test():
     B = Base()
-    M = Miner(char_name = local_settings.MINER_CHAR_NAME)
+    # M = Miner(char_name = local_settings.MINER_CHAR_NAME)
     L = Launcher()
 
     # Get coordinates (scaled) for the game launcher on the whole monitor

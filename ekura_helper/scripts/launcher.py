@@ -42,7 +42,7 @@ class Launcher(Base):
         of the launcher window after constructing the class.
         '''
         hwnd = self.getLauncherHwnd()
-        return hwnd if hwnd is None else self.getLauncherCoords()
+        return hwnd if hwnd is None else self.getWindowCoords(hwnd)
 
     def getLauncherHwnd(self):
         '''Get window handle number of the game launcher window.
@@ -50,10 +50,9 @@ class Launcher(Base):
         return self.getWindowHwnd(static.LAUNCHER_WINDOW_NAME)
 
     def getLauncherCoords(self):
-        '''Get coordinates of the game launcher window.
+        '''Get coordinates of the game launcher window. Added for more explicity.
         '''
-        hwnd = self.getLauncherHwnd()
-        return self.getWindowCoords(hwnd)
+        return self.screen_pos
 
     def openGameLauncher(self):
         '''Open the game launcher.
@@ -71,8 +70,11 @@ class Launcher(Base):
             print('Could not open the launcher window')
             return False
         time.sleep(2) # Wait for the launcher animations to finish
-        x_, y_ = static.LAUNCHER_DEFAULT_COORD[0], static.LAUNCHER_DEFAULT_COORD[1]
-        # win32gui.MoveWindow(hwnd, x_, y_) # Move the window to the default coordinates
+        x_scale, y_scale = static.MONITOR_LAUNCHER_DEFAULT_COORD[0], static.MONITOR_LAUNCHER_DEFAULT_COORD[1]
+        [x_abs, y_abs] = self.calculateCoords([x_scale, y_scale], from_scale=True, screen_pos_=self.monitor_coords)
+        width_ = int(self.screen_pos[2] - self.screen_pos[0])
+        height_ = int(self.screen_pos[3] - self.screen_pos[1])
+        win32gui.MoveWindow(hwnd, x_abs, y_abs, width_, height_, False) # Move the window to the default coordinates
         print('Launcher open')
         return True
 
