@@ -23,13 +23,10 @@ def main():
     # M = Miner(char_name = local_settings.MINER_CHAR_NAME)
     L = Launcher()
 
+    # L.inputName()
+    L.main()
+
     # M.main() # Mine
-    L.openGameLauncher()
-    
-    # game_coords = L.getLauncherCoords()
-    # x = B.calculateCoords(coords = game_coords[0:2], from_scale=False)
-    # y = B.calculateCoords(coords = game_coords[2:4], from_scale=False)
-    # print(x +  y)
 
 if __name__ == '__main__':
     main()

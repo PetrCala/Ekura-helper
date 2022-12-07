@@ -26,13 +26,14 @@ MINING_TEXT_COORD = [0.292, 0.800, 0.708, 0.953] # Message log range
 VALIDATION_COORDS = [CHAR_POS_COORD, MINING_TEXT_COORD] # Used in game position validation
 
 # Game launcher window coordinates
-LAUNCHER_NAME_COORD = [0.530, 0.715]
-LAUNCHER_PW_COORD = [0.530, 0.785]
-LAUNCHER_START_COORD = [0.530, 0.860]
+LAUNCHER_NAME_COORD = [0.460, 0.698, 0.606, 0.745] # For text reading
+LAUNCHER_NAME_POS = [0.530, 0.715] # For clicking 
+LAUNCHER_PW_COORD = [] 
+LAUNCHER_PW_POS = [0.530, 0.785]
+LAUNCHER_START_POS = [0.530, 0.860]
 
 # Monitor coordinates
 MONITOR_LAUNCHER_DEFAULT_COORD = [0.233, 0.245, 0.660, 0.616] # Default coordinates of the launcher, in terms of monitor size
-
 
 
 # Word lists

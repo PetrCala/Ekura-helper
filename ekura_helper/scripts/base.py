@@ -300,7 +300,7 @@ class Base():
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
-        lookup_words = [static.GAME_WINDOW_NAME, local_settings.MINER_CHAR_NAME] # Game window name
+        lookup_words = [static.GAME_WINDOW_NAME, local_settings.CHAR_NAME] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')
@@ -362,6 +362,23 @@ class Base():
         self.moveClick(x, y)
         win32gui.SetForegroundWindow(active_hwnd) # Return focus
         return True
+
+    def moveClick(self, x, y, from_scale=False):
+        '''Specify coordinates and click there. Used for clicks in game,
+        automaically adds a small wait window in order to guarantee the click.
+        Returns the cursor back to the starting position.
+        :arg:
+            from_scale(bool) - If True, input coordinates in scale.
+        '''
+        pos = queryMousePosition()
+        x_, y_ = pos.x, pos.y # Initial mouse coordinates
+        if from_scale:
+            [x, y] = self.calculateCoords([x, y], screen_pos_=self.screen_pos)
+        moveMouseTo(x, y)
+        time.sleep(0.1) # Allow for cursor positioning
+        click(x, y)
+        moveMouseTo(x_,y_) # Return the mouse
+        return None
 
     @staticmethod
     def checkStringForMatches(input_string:str, match_list:list, verbose:bool = False):
@@ -427,20 +444,6 @@ class Base():
         '''
         pos = queryMousePosition() # Query cursor position
         click(pos.x, pos.y) # Click
-        return None
-
-    @staticmethod
-    def moveClick(x, y):
-        '''Specify coordinates and click there. Used for clicks in game,
-        automaically adds a small wait window in order to guarantee the click.
-        Returns the cursor back to the starting position.
-        '''
-        pos = queryMousePosition()
-        x_, y_ = pos.x, pos.y # Initial mouse coordinates
-        moveMouseTo(x, y)
-        time.sleep(0.1) # Allow for cursor positioning
-        click(x, y)
-        moveMouseTo(x_,y_) # Return the mouse
         return None
 
     @staticmethod
