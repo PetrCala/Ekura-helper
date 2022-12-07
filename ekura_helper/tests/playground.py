@@ -19,8 +19,15 @@ pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract pa
 keyboard = Controller()
 
 def test():
+    B = Base()
     M = Miner(char_name = local_settings.MINER_CHAR_NAME)
-    M.main()
+    L = Launcher()
+
+    # Get coordinates (scaled) for the game launcher on the whole monitor
+    # game_coords = L.getLauncherCoords()
+    # x = B.calculateCoords(coords = game_coords[0:2], from_scale=False)
+    # y = B.calculateCoords(coords = game_coords[2:4], from_scale=False)
+    # print(x +  y)
 
 if __name__ == '__main__':
     test()

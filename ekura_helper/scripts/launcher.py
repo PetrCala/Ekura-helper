@@ -30,12 +30,19 @@ class classproperty(property):
 
 class Launcher(Base):
     def __init__(self):
-        self.screen_pos = self.getLauncherCoords() # Launcher window
         pass
 
     def main(self):
         # self.openGameLauncher()
         pass
+
+    @property
+    def screen_pos(self):
+        '''Position of the launcher. Kept as a property, in order to allow for opening
+        of the launcher window after constructing the class.
+        '''
+        hwnd = self.getLauncherHwnd()
+        return hwnd if hwnd is None else self.getLauncherCoords()
 
     def getLauncherHwnd(self):
         '''Get window handle number of the game launcher window.
@@ -64,7 +71,8 @@ class Launcher(Base):
             print('Could not open the launcher window')
             return False
         time.sleep(2) # Wait for the launcher animations to finish
-        win32gui.MoveWindow(hwnd) # Center the window
+        x_, y_ = static.LAUNCHER_DEFAULT_COORD[0], static.LAUNCHER_DEFAULT_COORD[1]
+        # win32gui.MoveWindow(hwnd, x_, y_) # Move the window to the default coordinates
         print('Launcher open')
         return True
 
