@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 
 from ctypes import windll
@@ -18,10 +18,11 @@ windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
 
-def test():
-    M = Miner(char_name = local_settings.MINER_CHAR_NAME)
-    M.main()
+def main():
+     M = Miner(char_name = local_settings.MINER_CHAR_NAME)
+     M.main()
+    # #L = Launcher()
+    # #L.main()
 
 if __name__ == '__main__':
-    test()
-
+    main()

@@ -15,9 +15,9 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from ekura_helper.tools import static
-from ekura_helper.tools import local_settings
-from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from tools import static
+from tools import local_settings
+from tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
@@ -304,7 +304,7 @@ class Base():
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
-        lookup_words = [static.GAME_WINDOW_NAME, static.MINER_CHAR_NAME] # Game window name
+        lookup_words = [static.GAME_WINDOW_NAME, local_settings.MINER_CHAR_NAME] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')
@@ -498,7 +498,3 @@ class Base():
     @staticmethod
     def dist(x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-
-if __name__ == '__main__':
-    B = Base()
-    B.main()

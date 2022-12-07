@@ -15,10 +15,10 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from ekura_helper.scripts.base import Base
-from ekura_helper.tools import static
-from ekura_helper.tools import local_settings
-from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from scripts.base import Base
+from tools import static
+from tools import local_settings
+from tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
@@ -58,9 +58,3 @@ class Screenalysis(Base):
         (r, g, b) = screen[y,x]
         print(f"Pixel at ({x}, {y}) - Red: {r}, Green: {g}, Blue: {b}")
         return [r,g,b]
-
-
-if __name__ == '__main__':
-    S = Screenalysis()
-    S.main()
-    

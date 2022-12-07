@@ -4,10 +4,8 @@ __pycache__/
 *$py.class
 
 # Build files and venv
-build/
-dist/
-*.egg-info/
-venv/
+.venv/
+.conda/
 
 # Custom files
 notes.txt

@@ -15,10 +15,10 @@ import pytesseract #Text recognition
 import pywintypes
 import win32.win32gui as win32gui
 
-from ekura_helper.scripts.base import Base
-from ekura_helper.tools import static
-from ekura_helper.tools import local_settings
-from ekura_helper.tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from scripts.base import Base
+from tools import static
+from tools import local_settings
+from tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
@@ -176,15 +176,3 @@ class Miner(Base):
         print(f'The node should be located at these coordinates: x={node[0]}, y={node[1]}.')
         #Here try to integrate the existing camera position, proximity to the node etc
         return node # [x, y]
-
-
-if __name__ == '__main__':
-    M = Miner(char_name = local_settings.MINER_CHAR_NAME)
-    M.main()
-    
-
-#Useful
-#(58, 144, 76) <- surely part of the node, 18 matches - green name
-#(146, 126, 134) <- diamond ore, possibly
-
-
