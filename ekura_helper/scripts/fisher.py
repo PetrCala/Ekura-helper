@@ -1,10 +1,12 @@
 ﻿import numpy as np
+import pandas as pd
 import random
 from datetime import datetime, timedelta
 import re
 import time
 import math
 import sys
+from pathlib import Path
 
 from ctypes import windll
 import cv2
@@ -80,12 +82,11 @@ class Fisher(InGameBot):
             if isinstance(fishing_state, str): # Fish caught
                 print(f'{fishing_state} found. The wait took {round(time.time() - start, 2)} seconds.')
                 wait_time = self.calculateFishWaitTime(fishing_state)
-                randomized_wait_time = self.randomizeWaitTime(wait_time) # Against bot detection
-                time.sleep(randomized_wait_time)
-                print(f'Pulling up after {round(randomized_wait_time, 2)} seconds...')
+                time.sleep(wait_time)
+                print(f'Pulling up after {round(wait_time, 2)} seconds...')
                 self.focusedInput('SPACE') # Pull up
                 time.sleep(2)
-                self.handleCatchResults(fish = fishing_state, time = randomized_wait_time)
+                self.handleCatchResults(fish = fishing_state, time = wait_time)
                 time.sleep(2) # Wait for the animations to finish
                 self.fishing_finished = True
                 print('Fish pulling complete.')
@@ -159,6 +160,27 @@ class Fisher(InGameBot):
                 f.write(f'Fish: {fish}, Wait time since message detection: {round(time,2)}s, Date: {datetime.now()}\n')
         return None
 
+    def convertExcelToDict(self):
+        '''Temporary method; delete when deploying.
+        Load the fish data and transform it into data as a dictionary in the format
+            {'Fish name': 'Losos', 'Average': 2.1, 'Min': 1.5, 'Max': 2.5}.
+        '''
+        result = []
+        path = str(Path().absolute()) + r'\notes\Fish data.xlsx'
+        data = pd.DataFrame(pd.read_excel(path, sheet_name = 'Fish summary'))
+        def convertRow(row):
+            out = {
+                'Fish name': row[0],
+                'Average': row[1],
+                'Min': row[2],
+                'Max': row[3]}
+            return out
+        for i in data.iterrows():
+            row = i[1]
+            transformed_data = convertRow(row)
+            result.append(transformed_data)
+        return result
+
     @staticmethod
     def readFishType(msg:str):
         '''Input the message with the fish on the rod, return an integer
@@ -172,16 +194,24 @@ class Fisher(InGameBot):
         for i in range(idx_before, idx_after):
             fish_list.append(msg_parts[i])
         fish_type = ' '.join(fish_list)
+        if fish_type in static.FISHING_BOT_TYPOS.keys():
+            fish_type = static.FISHING_BOT_TYPOS.get(fish_type) # Get correct name
         return fish_type
 
     @staticmethod
     def calculateFishWaitTime(fish_name:str):
         '''Input a fish name and return its wait time.
         '''
-        res = next((sub for sub in static.FISHING_FISH_INFORMATION if fish_name in sub['Fish names']), None)
+        wait_random = random.uniform(1,6)
+        res = next((sub for sub in static.FISHING_FISH_INFORMATION if fish_name in sub['Fish name']), None)
         if res is None:
             print(f'{fish_name} is not in our library... Let\'s wait randomly until pulling up')
-            return 5
-        return res['Time']
+            return wait_random
+        # avg_ = res.get('Average')
+        min_, max_ = res.get('Min'), res.get('Max')
+        min_ = min_ if min_ != 0.0 else wait_random # No data
+        max_ = max_ if max_ != 0.0 else wait_random # No data
+        wait_time = random.uniform(min_ - min_/3, max_ + max_/3) # Add an offset to allow for data collection
+        return round(wait_time, 2)
 
         

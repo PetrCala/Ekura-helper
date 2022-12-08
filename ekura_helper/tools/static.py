@@ -42,19 +42,47 @@ FISHING_FISH_CAUGHT_KEYWORDS = ['Tvým', 'úlovkem', 'délce']
 
 # Fish names, and the time required to wait for a successful catch
 FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
-FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Mandarinová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín ostrobřichý',
-    'Okoun', 'Tenchi', 'Sumec', 'Mřenka', 'Mřénka', 'Lotosová ryba', 'Lolosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
+FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín ostrobřichý',
+    'Okoun', 'Tenchi', 'Sumec', 'Mřenka',  'Lotosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
     'Požehnaný pergamen', 'Malá ryba']
 FISHING_5S_FISH = ['Velký candát', 'Kapr hladký', 'Zlatá rybka', 'Prut zlata (1kk)']
 FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
+FISHING_BOT_TYPOS = {
+    'Mandarinová ryba': 'Mandarínová ryba',
+    'Mřénka': 'Mřenka',
+    'Lolosová ryba': 'Lotosová ryba',
+}
 
 # Fish wait time information
 FISHING_FISH_INFORMATION = [
-    {'Fish names': FISHING_0S_FISH, 'Time': 1.1},
-    {'Fish names': FISHING_3S_FISH, 'Time': 1.75},
-    {'Fish names': FISHING_5S_FISH, 'Time': 3.75}
-]
-
+    {'Fish name': 'Pstruh říční', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Koruška', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Nožík', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Candát', 'Average': 1.826, 'Min': 1.03, 'Max': 2.8},
+    {'Fish name': ' Mandarínová ryba', 'Average': 1.4, 'Min': 1.4, 'Max': 1.4},
+    {'Fish name': ' Kapr', 'Average': 1.46, 'Min': 1.14, 'Max': 2.0},
+    {'Fish name': ' Losos', 'Average': 1.8, 'Min': 1.12, 'Max': 2.93},
+    {'Fish name': ' Amur bílý', 'Average': 1.24, 'Min': 1.18, 'Max': 1.3},
+    {'Fish name': ' Pstruh', 'Average': 1.17, 'Min': 1.17, 'Max': 1.17},
+    {'Fish name': ' Úhoř', 'Average': 2.04, 'Min': 1.85, 'Max': 2.23},
+    {'Fish name': ' Pstruh duhový', 'Average': 1.16, 'Min': 1.16, 'Max': 1.16},
+    {'Fish name': ' Perlín ostrobřichý', 'Average': 2.07, 'Min': 1.68, 'Max': 2.46},
+    {'Fish name': ' Okoun', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Tenchi', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Sumec', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Mřenka', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Lotosová ryba', 'Average': 1.22, 'Min': 1.22, 'Max': 1.22},
+    {'Fish name': ' Ayu', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Shiri', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Stříbrný klíč', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Zlatý klíč', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Kámen duše', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Požehnaný pergamen', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Malá ryba', 'Average': 1.93, 'Min': 1.27, 'Max': 2.97},
+    {'Fish name': ' Velký candát', 'Average': 3.946, 'Min': 3.54, 'Max': 4.32},
+    {'Fish name': ' Kapr hladký', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Zlatá rybka', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+    {'Fish name': ' Prut zlata (1kk)', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0}]
 
 ### VARIOUS ###
 

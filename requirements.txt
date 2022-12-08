@@ -1,4 +1,6 @@
 ﻿numpy>=1.22.0
+openpyxl>=3.0.10
+pandas>=1.5.2
 Pillow>=9.3.0
 opencv-python>=4.5.5.64 #cv2
 pynput>=1.7.6
