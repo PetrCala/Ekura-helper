@@ -16,6 +16,7 @@ import pywintypes
 import win32.win32gui as win32gui
 
 from scripts.base import Base
+from scripts.base import InGameBot
 from tools import static
 from tools import local_settings
 from tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
@@ -28,7 +29,7 @@ class classproperty(property):
     def __get__(self, cls, owner):
         return classmethod(self.fget).__get__(None, owner)()
 
-class Miner(Base):
+class Miner(InGameBot):
     def __init__(self, char_name:str, *args, **kwargs):
         '''Constructor for the Miner class. Game must be running in order for the
             constructor to be callable.
@@ -36,16 +37,12 @@ class Miner(Base):
         Args:
             char_name (str): Name of the character which shall be operated by the bot.
         '''
-        # Variables
-        self.char_name = char_name
         # Attributes
-        self.screen_pos = self.getWindowCoords() # Function defaults to game window
         self.mining_finished = True # Boolean to indicate finished mining
         self.mining_impossible = True # There is no ore to mine - search/wait for a new one
         self.mining_timer = datetime.now() + timedelta(days = -1)
         # Constructor operations
-        super(Miner, self).__init__(*args, **kwargs) # Master class inheritance
-        self.validateGamePos() # Verify that the game can be located
+        super(Miner, self).__init__(char_name, *args, **kwargs) # Master class inheritance
 
     def main(self):
         '''Main method of the Miner clsass

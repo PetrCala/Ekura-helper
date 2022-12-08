@@ -83,30 +83,6 @@ class Base():
             y = round((y_inp - current_screen[1])/screen_height, 3)
         return [x, y]
 
-    def validateGamePos(self):
-        '''Check that the game window is in a position where all important inputs can be read.
-        '''
-        print('Validating game position...')
-        start_time = time.time()
-        screen_pos = self.screen_pos # Actual game position
-        monitor_pos = self.monitor_coords # Monitor position
-        x_verify, y_verify = [], [] # Coordinates to be verified
-        for coords in static.VALIDATION_COORDS:
-            x_verify = x_verify + [coords[0], coords[2]]
-            y_verify = y_verify + [coords[1], coords[3]]
-        # Absolute coordinates       
-        x_abs = [self.calculateCoords([coord,0])[0] for coord in x_verify]
-        y_abs = [self.calculateCoords([0,coord])[1] for coord in y_verify]
-        # Check if all coordinates are valid
-        x_valid = all([monitor_pos[0] < coord < monitor_pos[2] for coord in x_abs])
-        y_valid = all([monitor_pos[1] < coord < monitor_pos[3] for coord in y_abs])
-        if not x_valid and y_valid:
-            raise SystemError('Some crucial parts of the game window are hidden. Please recenter the game window.')
-        # Possibly move the game automatically to a pre-defined location, if it makes more sense
-        validation_time = round(time.time() - start_time, 2)
-        print(f'The game position is valid. The validation took {validation_time} seconds.')
-        return True
-
     def rangeToPixels(self, range:list):
         '''Specify a list of 4 scale coordinates and return a list of four points,
         which define (in pixels) the top left and bottom right points
@@ -273,95 +249,14 @@ class Base():
             time.sleep(period)
         return True
 
-    def useKeyInGame(self, key):
-        '''Press a key using the directKeys script. Used for a more reliable key pressing in game. Unsuitable for
-        longer text input outside of game.
-
-        :args:
-            key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
-        '''
-        if not key in static.KEYS.keys():
-            raise ValueError('This key cannot be pressed')
-        if key in self.numbers:
-            key = self.num_key(key) #Parse a roman number
-        key_hx = static.KEYS.get(key) 
-        PressKey(key_hx)
-        time.sleep(1)
-        ReleaseKey(key_hx)
-        return None
-
-    def useKeysInGame(self, keys, sleep = False):
-        '''For each key in keys, press this key in game.
-        By default, insert no sleep time in between key presses.
-        '''
-        for key in keys:
-            self.useKeyInGame(key, sleep = sleep)
-
-    def getGameHwnd(self):
-        '''Return the hwnd of the main game window. If not open, throw a system error.
-        '''
-        lookup_words = [static.GAME_WINDOW_NAME, local_settings.CHAR_NAME] # Game window name
-        hwnd = self.getWindowHwnd(lookup_words)
-        if hwnd is None:
-            raise SystemError('The game is not running. Start the game first')
-        return hwnd
-
-    def getWindowCoords(self, hwnd:int = None):
+    def getWindowCoords(self, hwnd:int):
         '''Return the coordinates of the game window as a list of 4 coordinates.
 
         :arg:
-            hwnd (int) - Handle number of the window to assess. Defaults to None,
-                in which case the main game window is used.
+            hwnd (int) - Handle number of the window to assess.
         '''
-        if hwnd is None:
-            hwnd = self.getGameHwnd()
         pos = win32gui.GetWindowPlacement(hwnd)
         return list(pos[4])
-
-    def focusGame(self):
-        '''Bring the game into focus.
-        '''
-        hwnd = self.getGameHwnd() # Automatically raises error if not found.
-        win32gui.SetForegroundWindow(hwnd)
-        time.sleep(0.2) # Allow for smoother immediate input
-        return True
-
-    def focusedInput(self, input:str, window_hwnd:int = None):
-        '''Main method for sending key input into game. Handles window focus, allows for
-        single keys, or multiple keys.
-
-        :arg:
-            input (str) - The key(s) to be pressed in game/window.
-            window_hwnd (int) - Window handle of the desired window.
-        '''
-        assert isinstance(input, str), 'The input must be a string.'
-        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
-        if window_hwnd is None:
-            self.focusGame()
-        else:
-            win32gui.SetForegroundWindow(window_hwnd)
-        if len(input) > 1:
-            self.useKeysInGame(input)
-        else:
-            self.useKeyInGame(input)
-        win32gui.SetForegroundWindow(active_hwnd) # Return focus
-        return True
-
-    def focusedClick(self, x:int, y:int, window_hwnd:int = None):
-        '''Click with focus handling.
-
-        :arg:
-            x,y (int) - Coordinates of the click
-            window_hwnd (int) - Window handle of the desired window.
-        '''
-        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
-        if window_hwnd is None:
-            self.focusGame()
-        else:
-            win32gui.SetForegroundWindow(window_hwnd)
-        self.moveClick(x, y)
-        win32gui.SetForegroundWindow(active_hwnd) # Return focus
-        return True
 
     def moveClick(self, x, y, from_scale=False):
         '''Specify coordinates and click there. Used for clicks in game,
@@ -457,17 +352,6 @@ class Base():
         y_ = int(y + scale2)
         return x_, y_
 
-    @property
-    def char_pos(self):
-        '''Position of the character, given by two coordinates.
-        '''
-        raw_coords = self.readTextInRange(static.CHAR_POS_COORD)
-        if not re.match(static.CHAR_POS_REGEX, raw_coords):
-            raise ValueError('Could not identify the character\'s coordinates.')
-        coords_set = re.match(static.CHAR_POS_REGEX_EXTRACT, raw_coords)
-        coords = int(coords_set[1]), int(coords_set[2]) # x,y
-        return coords
-        
     @staticmethod
     def getWindowHwnd(lookup_words):
         '''Specify a window name and return its window handle. Allows regex patterns.
@@ -497,3 +381,146 @@ class Base():
     @staticmethod
     def dist(x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+
+class InGameBot(Base):
+    '''A base class for all in-game bots. Callable after the game is running.
+    '''
+    def __init__(self, char_name:str, *args, **kwargs):
+        '''Constructor for the Fisher class. Game must be running in order for the
+            constructor to be callable.
+
+        Args:
+            char_name (str): Name of the character which shall be operated by the bot.
+        '''
+        # Variables
+        self.char_name = char_name
+        # Attributes
+        self.screen_pos = self.getGameCoords() # Function defaults to game window
+        # Constructor operations
+        super(InGameBot, self).__init__(*args, **kwargs) # Master class inheritance
+        self.validateGamePos() # Verify that the game can be located
+
+    @property
+    def char_pos(self):
+        '''Position of the character, given by two coordinates.
+        '''
+        raw_coords = self.readTextInRange(static.CHAR_POS_COORD)
+        if not re.match(static.CHAR_POS_REGEX, raw_coords):
+            raise ValueError('could not identify the character\'s coordinates.')
+        coords_set = re.match(static.CHAR_POS_REGEX_EXTRACT, raw_coords)
+        coords = int(coords_set[1]), int(coords_set[2]) # x,y
+        return coords
+
+    def validateGamePos(self):
+        '''Check that the game window is in a position where all important inputs can be read.
+        '''
+        print('Validating game position...')
+        start_time = time.time()
+        screen_pos = self.screen_pos # Actual game position
+        monitor_pos = self.monitor_coords # Monitor position
+        x_verify, y_verify = [], [] # Coordinates to be verified
+        for coords in static.VALIDATION_COORDS:
+            x_verify = x_verify + [coords[0], coords[2]]
+            y_verify = y_verify + [coords[1], coords[3]]
+        # Absolute coordinates       
+        x_abs = [self.calculateCoords([coord,0], screen_pos_ = screen_pos)[0] for coord in x_verify]
+        y_abs = [self.calculateCoords([0,coord], screen_pos_ = screen_pos)[1] for coord in y_verify]
+        # Check if all coordinates are valid
+        x_valid = all([monitor_pos[0] < coord < monitor_pos[2] for coord in x_abs])
+        y_valid = all([monitor_pos[1] < coord < monitor_pos[3] for coord in y_abs])
+        if not x_valid and y_valid:
+            raise SystemError('Some crucial parts of the game window are hidden. Please recenter the game window.')
+        # Possibly move the game automatically to a pre-defined location, if it makes more sense
+        validation_time = round(time.time() - start_time, 2)
+        print(f'The game position is valid. The validation took {validation_time} seconds.')
+        return True
+        
+    def getGameCoords(self):
+        '''Return the coordinates of the game window as a list of 4 coordinates.
+
+        :arg:
+            hwnd (int) - Handle number of the window to assess. Defaults to None,
+                in which case the main game window is used.
+        '''
+        hwnd = self.getGameHwnd()
+        pos = win32gui.GetWindowPlacement(hwnd)
+        return list(pos[4])
+
+    def getGameHwnd(self):
+        '''Return the hwnd of the main game window. If not open, throw a system error.
+        '''
+        lookup_words = [static.GAME_WINDOW_NAME, local_settings.CHAR_NAME] # Game window name
+        hwnd = self.getWindowHwnd(lookup_words)
+        if hwnd is None:
+            raise SystemError('The game is not running. Start the game first')
+        return hwnd
+
+    def focusGame(self):
+        '''Bring the game into focus.
+        '''
+        hwnd = self.getGameHwnd() # Automatically raises error if not found.
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.2) # Allow for smoother immediate input
+        return True
+
+    def useKeyInGame(self, key):
+        '''Press a key using the directKeys script. Used for a more reliable key pressing in game. Unsuitable for
+        longer text input outside of game.
+
+        :args:
+            key - Key to be pressed. Accepts all inputs of pynput, along with roman numbers in a string form (i.e. '5').
+        '''
+        if not key in static.KEYS.keys():
+            raise ValueError('This key cannot be pressed')
+        if key in self.numbers:
+            key = self.num_key(key) #Parse a roman number
+        key_hx = static.KEYS.get(key) 
+        PressKey(key_hx)
+        time.sleep(1)
+        ReleaseKey(key_hx)
+        return None
+
+    def useKeysInGame(self, keys, sleep = False):
+        '''For each key in keys, press this key in game.
+        By default, insert no sleep time in between key presses.
+        '''
+        for key in keys:
+            self.useKeyInGame(key, sleep = sleep)
+
+    def focusedInput(self, input:str, window_hwnd:int = None):
+        '''Main method for sending key input into game. Handles window focus, allows for
+        single keys, or multiple keys.
+
+        :arg:
+            input (str) - The key(s) to be pressed in game/window.
+            window_hwnd (int) - Window handle of the desired window.
+        '''
+        assert isinstance(input, str), 'The input must be a string.'
+        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
+        if window_hwnd is None:
+            self.focusGame()
+        else:
+            win32gui.SetForegroundWindow(window_hwnd)
+        if len(input) > 1:
+            self.useKeysInGame(input)
+        else:
+            self.useKeyInGame(input)
+        win32gui.SetForegroundWindow(active_hwnd) # Return focus
+        return True
+
+    def focusedClick(self, x:int, y:int, window_hwnd:int = None):
+        '''Click with focus handling.
+
+        :arg:
+            x,y (int) - Coordinates of the click
+            window_hwnd (int) - Window handle of the desired window.
+        '''
+        active_hwnd = win32gui.GetForegroundWindow() # Focused window before input
+        if window_hwnd is None:
+            self.focusGame()
+        else:
+            win32gui.SetForegroundWindow(window_hwnd)
+        self.moveClick(x, y)
+        win32gui.SetForegroundWindow(active_hwnd) # Return focus
+        return True
