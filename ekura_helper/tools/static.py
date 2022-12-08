@@ -37,7 +37,8 @@ FISHING_LURE_SLOT = '1' # Slot in the hotbar with the lure
 FISHING_IMPOSSIBLE_KEYWORDS = ['Tady', 'nemůžeš', 'lovit', 'ryby']
 FISHING_NO_LURE_KEYWORDS = ['žádnou', 'Pokud', 'chceš', 'chytat', 'ryby', 'musíš', 'použít', 'návnadu']
 FISHING_FISH_ON_KEYWORDS = ['Vypadá', 'to', 'že', 'právě', 'zabírá', 'na']
-FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'je', 'fuč']
+FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'fuč']
+FISHING_FISH_CAUGHT_KEYWORDS = ['Tvým', 'úlovkem', 'délce']
 
 # Fish names, and the time required to wait for a successful catch
 FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
@@ -49,9 +50,9 @@ FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
 
 # Fish wait time information
 FISHING_FISH_INFORMATION = [
-    {'Fish names': FISHING_0S_FISH, 'Time': 0},
-    {'Fish names': FISHING_3S_FISH, 'Time': 4.5},
-    {'Fish names': FISHING_5S_FISH, 'Time': 6.5}
+    {'Fish names': FISHING_0S_FISH, 'Time': 2},
+    {'Fish names': FISHING_3S_FISH, 'Time': 2.5},
+    {'Fish names': FISHING_5S_FISH, 'Time': 4.5}
 ]
 
 

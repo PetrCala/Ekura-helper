@@ -74,7 +74,7 @@ class Fisher(InGameBot):
             self.focusedInput('SPACE')
         self.fishing_finished = False # Fishing started
         print('Initiating fishing...')
-        time.sleep(3) # Wait for the messages to disappear
+        time.sleep(10) # No fish in the first 10 seconds
         while (not self.fishing_finished) and (time_checked < 50):
             fishing_state = self.checkFishingState()
             if isinstance(fishing_state, str): # Fish caught
@@ -84,7 +84,9 @@ class Fisher(InGameBot):
                 time.sleep(randomized_wait_time)
                 print(f'Pulling up after {round(randomized_wait_time, 2)} seconds...')
                 self.focusedInput('SPACE') # Pull up
-                time.sleep(4) # Wait for the animations to finish
+                time.sleep(2)
+                self.handleCatchResults(fish = fishing_state, time = randomized_wait_time)
+                time.sleep(2) # Wait for the animations to finish
                 self.fishing_finished = True
                 print('Fish pulling complete.')
                 return True
@@ -142,6 +144,23 @@ class Fisher(InGameBot):
         upper_bound = 1 - bias
         offset = random.uniform(lower_bound, upper_bound) 
         return time + offset
+    
+    def handleCatchResults(self, fish:str, time:float):
+        '''Notes down the statistics, if the catch was successful.
+        :arg:
+            fish (str) - Name of the fish.
+            time (float) - Time the character waited from the message detection
+                until pulling the fish.
+        '''
+        msg = self.readTextInRange(static.MESSAGE_LOG_COORD)
+        gone = self.checkStringForMatches(msg, static.FISHING_FISH_GONE_KEYWORDS)
+        caught = self.checkStringForMatches(msg, static.FISHING_FISH_CAUGHT_KEYWORDS)
+        if gone > 0: # Fish gone
+            return None
+        if caught > 1: # Successful catch
+            with open('fish_stats.txt', 'a') as f:
+                f.write(f'Fish: {fish}, Wait time since message detection: {round(time,2)}s, Date: {datetime.now()}\n')
+        return None
 
     @staticmethod
     def readFishType(msg:str):

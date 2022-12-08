@@ -11,4 +11,5 @@ __pycache__/
 local_settings.py
 
 # Custom files
-notes.txt
+notes/
+fish_stats.txt
