@@ -45,6 +45,7 @@ class Fisher(InGameBot):
         # Attributes
         self.fishing_impossible = True
         self.fishing_finished = True
+        self.check_interval = 1 # Float, amount of time to wait before checking fishing state
         self.fishing_timer = datetime.now() + timedelta(days = -1)
         # Constructor operations
         super(Fisher, self).__init__(char_name, *args, **kwargs) # Master class inheritance
@@ -53,9 +54,11 @@ class Fisher(InGameBot):
         '''Main method of the Miner clsass
         '''
         while True:
-            self.fish()
-            while not self.fishing_impossible:
+            fishing_count = 0
+            self.fishing_impossible = False # Allow for fishing to start
+            while (not self.fishing_impossible) and (fishing_count <= 10):
                 self.fish()
+                fishing_count += 1
 
     def fish(self):
         '''Assuming all fishing requirements were fulfilled, start fishing.
@@ -64,24 +67,28 @@ class Fisher(InGameBot):
         time_checked = 0
         start = time.time()
         self.focusedInput('SPACE')
+        time.sleep(0.4) # Wait for the message to appear
         we_fishing = self.checkIfFishingStarted()
         if we_fishing is False: # Start fishing (check automatically puts on lure)
+            time.sleep(0.2) # Allow for proper refocusing
             self.focusedInput('SPACE')
         self.fishing_finished = False # Fishing started
         print('Initiating fishing...')
-        while (not self.fishing_finished) and (time_checked < 60):
+        time.sleep(3) # Wait for the messages to disappear
+        while (not self.fishing_finished) and (time_checked < 50):
             fishing_state = self.checkFishingState()
             if isinstance(fishing_state, str): # Fish caught
-                print(f'Fish found. The wait took {time.time() - start} seconds.')
+                print(f'{fishing_state} found. The wait took {round(time.time() - start, 2)} seconds.')
                 wait_time = self.calculateFishWaitTime(fishing_state)
                 randomized_wait_time = self.randomizeWaitTime(wait_time) # Against bot detection
                 time.sleep(randomized_wait_time)
+                print(f'Pulling up after {round(randomized_wait_time, 2)} seconds...')
                 self.focusedInput('SPACE') # Pull up
                 time.sleep(4) # Wait for the animations to finish
                 self.fishing_finished = True
                 print('Fish pulling complete.')
                 return True
-            time.sleep(0.7)
+            time.sleep(self.check_interval) # Wait before checking again
             time_checked += 1
         print('Could not find any fish. Trying again...')
         return True
@@ -98,7 +105,8 @@ class Fisher(InGameBot):
             return False
         no_lure = self.checkStringForMatches(msg, static.FISHING_NO_LURE_KEYWORDS, verbose = False)
         if no_lure > 1:
-            print('You have no bait. Putting on bait...')
+            time.sleep(0.2) # Allow for proper input
+            print('No bait is on. Putting on bait...')
             self.focusedInput(static.FISHING_LURE_SLOT) # Put on lure
             return False
         self.fishing_impossible = False
@@ -115,9 +123,26 @@ class Fisher(InGameBot):
         if ('že' in msg_parts) and ('právě' in msg_parts):
             fish_type = self.readFishType(msg)
             return fish_type
-        # Add handler when the text is about the fish being gone
+        fishing_failed = self.checkStringForMatches(msg, static.FISHING_FISH_GONE_KEYWORDS)
+        if fishing_failed > 1:
+            print('Failed to catch the fish.')
+            self.fishing_finished = True
+            time.sleep(4) # Waiting for the fishing state to reset
         return None
         
+    def randomizeWaitTime(self, time:float):
+        '''Input a float indicating fish wait time, and randomize it
+        by shifting it several tenths of a second in either direction.
+        Return the new time.
+        :args:
+            time (float): Time to wait.
+        '''
+        bias = self.check_interval / 2 # Expected bias induced by imprecise checking
+        lower_bound = (-1) - bias
+        upper_bound = 1 - bias
+        offset = random.uniform(lower_bound, upper_bound) 
+        return time + offset
+
     @staticmethod
     def readFishType(msg:str):
         '''Input the message with the fish on the rod, return an integer
@@ -140,17 +165,7 @@ class Fisher(InGameBot):
         res = next((sub for sub in static.FISHING_FISH_INFORMATION if fish_name in sub['Fish names']), None)
         if res is None:
             print(f'{fish_name} is not in our library... Let\'s wait randomly until pulling up')
-            return 2.5 
+            return 5
         return res['Time']
 
-    @staticmethod
-    def randomizeWaitTime(time:float):
-        '''Input a float indicating fish wait time, and randomize it
-        by shifting it several tenths of a second in either direction.
-        Return the new time.
-        :args:
-            time (float): Time to wait.
-        '''
-        offset = random.uniform(-1.3, 0.7) # Bias downwards
-        return time + offset
         

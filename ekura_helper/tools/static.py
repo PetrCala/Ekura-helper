@@ -13,7 +13,7 @@ TESSDATA_DIR_CONFIG = r'--tessdata-dir "C:\\Program Files (x86)\\Tesseract-OCR\\
 ### GAME ###
 
 # Game window coordinates
-MESSAGE_LOG_COORD = [0.292, 0.800, 0.708, 0.953] # Message log range
+MESSAGE_LOG_COORD = [0.292, 0.880, 0.708, 0.953] # Message log range
 CHAR_POS_COORD = [0.936, 0.209, 0.979, 0.230] # Character position
 VALIDATION_COORDS = [CHAR_POS_COORD, MESSAGE_LOG_COORD] # Used in game position validation
 
@@ -41,8 +41,8 @@ FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'je', 'fuč']
 
 # Fish names, and the time required to wait for a successful catch
 FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
-FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín Ostrobřichý',
-    'Okoun', 'Tenchi', 'Sumec', 'Mřenka', 'Lotosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
+FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Mandarinová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín ostrobřichý',
+    'Okoun', 'Tenchi', 'Sumec', 'Mřenka', 'Mřénka', 'Lotosová ryba', 'Lolosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
     'Požehnaný pergamen', 'Malá ryba']
 FISHING_5S_FISH = ['Velký candát', 'Kapr hladký', 'Zlatá rybka', 'Prut zlata (1kk)']
 FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
@@ -50,8 +50,8 @@ FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
 # Fish wait time information
 FISHING_FISH_INFORMATION = [
     {'Fish names': FISHING_0S_FISH, 'Time': 0},
-    {'Fish names': FISHING_3S_FISH, 'Time': 4},
-    {'Fish names': FISHING_5S_FISH, 'Time': 6},
+    {'Fish names': FISHING_3S_FISH, 'Time': 4.5},
+    {'Fish names': FISHING_5S_FISH, 'Time': 6.5}
 ]
 
 
