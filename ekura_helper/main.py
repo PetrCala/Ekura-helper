@@ -1,5 +1,7 @@
 ﻿import os
 import sys
+import re
+import time
 
 from ctypes import windll
 from pynput.keyboard import Key, HotKey, Controller
@@ -22,12 +24,10 @@ keyboard = Controller()
 def main():
     B = Base()
     # M = Miner(char_name = local_settings.CHAR_NAME)
-    F = Fisher(char_name = 'Stand')
+    # F = Fisher(char_name = 'Stand')
     # L = Launcher()
 
-    # print(F.screen_pos)
-    # F.prepareForFishing()
-
+    test_msg = 'Vypadá to, že Shiri právě zabírá na udici'
     # M.main() # Mine
 
 if __name__ == '__main__':

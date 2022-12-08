@@ -32,7 +32,24 @@ MINING_IMPOSSIBLE_KEYWORDS = ['Tady', 'kopat', 'nemůžeš', 'žádná', 'nenach
 
 ### FISHING ###
 
-FISHING_NO_LURE_KEYWORDS = ['žádnou', 'návnadu', 'Pokud', 'chceš', 'chytat', 'ryby', 'musíš', 'použít', 'návnadu']
+FISHING_LURE_SLOT = 1 # Slot in the hotbar with the lure
+
+FISHING_IMPOSSIBLE_KEYWORDS = ['Tady', 'nemůžeš', 'lovit', 'ryby']
+FISHING_NO_LURE_KEYWORDS = ['žádnou', 'Pokud', 'chceš', 'chytat', 'ryby', 'musíš', 'použít', 'návnadu']
+FISHING_FISH_ON_KEYWORDS = ['Vypadá', 'to', 'že', 'právě', 'zabírá', 'na']
+
+# Fish names, and the time required to wait for a successful catch
+FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
+FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín Ostrobřichý',
+    'Okoun', 'Tenchi', 'Sumec', 'Mřenka', 'Lotosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
+    'Požehnaný pergamen', 'Malá ryba']
+FISHING_5S_FISH = ['Velký candát', 'Kapr hladký', 'Zlatá rybka', 'Prut zlata (1kk)']
+FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
+FISHING_FISH_INFORMATION = [
+    {'Fish names': FISHING_0S_FISH, 'Time': 0},
+    {'Fish names': FISHING_3S_FISH, 'Time': 3},
+    {'Fish names': FISHING_5S_FISH, 'Time': 5},
+]
 
 
 ### VARIOUS ###
