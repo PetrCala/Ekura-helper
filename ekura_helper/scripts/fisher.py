@@ -139,10 +139,7 @@ class Fisher(InGameBot):
         :args:
             time (float): Time to wait.
         '''
-        bias = self.check_interval / 2 # Expected bias induced by imprecise checking
-        lower_bound = (-1) - bias
-        upper_bound = 1 - bias
-        offset = random.uniform(lower_bound, upper_bound) 
+        offset = random.uniform(-0.75, 0.75) 
         return time + offset
     
     def handleCatchResults(self, fish:str, time:float):

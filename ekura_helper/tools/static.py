@@ -50,9 +50,9 @@ FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
 
 # Fish wait time information
 FISHING_FISH_INFORMATION = [
-    {'Fish names': FISHING_0S_FISH, 'Time': 2},
-    {'Fish names': FISHING_3S_FISH, 'Time': 2.5},
-    {'Fish names': FISHING_5S_FISH, 'Time': 4.5}
+    {'Fish names': FISHING_0S_FISH, 'Time': 1.1},
+    {'Fish names': FISHING_3S_FISH, 'Time': 1.75},
+    {'Fish names': FISHING_5S_FISH, 'Time': 3.75}
 ]
 
 
