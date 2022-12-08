@@ -41,19 +41,6 @@ FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'fuč']
 FISHING_FISH_CAUGHT_KEYWORDS = ['Tvým', 'úlovkem', 'délce']
 
 # Fish names, and the time required to wait for a successful catch
-FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
-FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Kapr', 'Losos', 'Amur bílý', 'Pstruh', 'Úhoř', 'Pstruh duhový', 'Perlín ostrobřichý',
-    'Okoun', 'Tenchi', 'Sumec', 'Mřenka',  'Lotosová ryba', 'Ayu', 'Shiri', 'Stříbrný klíč', 'Zlatý klíč', 'Kámen duše',
-    'Požehnaný pergamen', 'Malá ryba']
-FISHING_5S_FISH = ['Velký candát', 'Kapr hladký', 'Zlatá rybka', 'Prut zlata (1kk)']
-FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
-FISHING_BOT_TYPOS = {
-    'Mandarinová ryba': 'Mandarínová ryba',
-    'Mřénka': 'Mřenka',
-    'Lolosová ryba': 'Lotosová ryba',
-}
-
-# Fish wait time information
 FISHING_FISH_INFORMATION = [
     {'Fish name': 'Pstruh říční', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': ' Koruška', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
@@ -83,6 +70,12 @@ FISHING_FISH_INFORMATION = [
     {'Fish name': ' Kapr hladký', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': ' Zlatá rybka', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': ' Prut zlata (1kk)', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0}]
+
+FISHING_BOT_TYPOS = {
+    'Mandarinová ryba': 'Mandarínová ryba',
+    'Mřénka': 'Mřenka',
+    'Lolosová ryba': 'Lotosová ryba',
+}
 
 ### VARIOUS ###
 
