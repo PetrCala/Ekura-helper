@@ -53,6 +53,7 @@ class Fisher(InGameBot):
         '''Main method of the Miner clsass
         '''
         while True:
+            self.fish()
             while not self.fishing_impossible:
                 self.fish()
 
@@ -61,23 +62,28 @@ class Fisher(InGameBot):
         Return True if the fishing was successful, and False otherwise.
         '''
         time_checked = 0
+        start = time.time()
         self.focusedInput('SPACE')
         we_fishing = self.checkIfFishingStarted()
         if we_fishing is False: # Start fishing (check automatically puts on lure)
-            self.focusedClick('SPACE')
+            self.focusedInput('SPACE')
         self.fishing_finished = False # Fishing started
-        while (not self.fishing_finished) and (time_checked < 40):
+        print('Initiating fishing...')
+        while (not self.fishing_finished) and (time_checked < 60):
             fishing_state = self.checkFishingState()
             if isinstance(fishing_state, str): # Fish caught
+                print(f'Fish found. The wait took {time.time() - start} seconds.')
                 wait_time = self.calculateFishWaitTime(fishing_state)
                 randomized_wait_time = self.randomizeWaitTime(wait_time) # Against bot detection
                 time.sleep(randomized_wait_time)
                 self.focusedInput('SPACE') # Pull up
-                time.sleep(5) # Wait for the animations to finish
+                time.sleep(4) # Wait for the animations to finish
                 self.fishing_finished = True
+                print('Fish pulling complete.')
                 return True
             time.sleep(0.7)
             time_checked += 1
+        print('Could not find any fish. Trying again...')
         return True
 
     def checkIfFishingStarted(self):
@@ -95,6 +101,7 @@ class Fisher(InGameBot):
             print('You have no bait. Putting on bait...')
             self.focusedInput(static.FISHING_LURE_SLOT) # Put on lure
             return False
+        self.fishing_impossible = False
         return True
 
     def checkFishingState(self):
@@ -106,7 +113,7 @@ class Fisher(InGameBot):
         msg = self.readTextInRange(static.MESSAGE_LOG_COORD, view_range=False)
         msg_parts = msg.split()
         if ('že' in msg_parts) and ('právě' in msg_parts):
-            fish_type = self.readFishType()
+            fish_type = self.readFishType(msg)
             return fish_type
         # Add handler when the text is about the fish being gone
         return None
@@ -122,7 +129,7 @@ class Fisher(InGameBot):
         idx_before = msg_parts.index('že') + 1
         idx_after = msg_parts.index('právě')
         for i in range(idx_before, idx_after):
-            fish_list.append(i)
+            fish_list.append(msg_parts[i])
         fish_type = ' '.join(fish_list)
         return fish_type
 

@@ -24,10 +24,12 @@ keyboard = Controller()
 def main():
     B = Base()
     # M = Miner(char_name = local_settings.CHAR_NAME)
-    # F = Fisher(char_name = 'Stand')
-    # L = Launcher()
+    F = Fisher(char_name = 'Stand')
+    L = Launcher()
 
-    test_msg = 'Vypadá to, že Shiri právě zabírá na udici'
+    F.main()
+    # L.login()
+
     # M.main() # Mine
 
 if __name__ == '__main__':

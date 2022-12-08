@@ -32,11 +32,12 @@ MINING_IMPOSSIBLE_KEYWORDS = ['Tady', 'kopat', 'nemůžeš', 'žádná', 'nenach
 
 ### FISHING ###
 
-FISHING_LURE_SLOT = 1 # Slot in the hotbar with the lure
+FISHING_LURE_SLOT = '1' # Slot in the hotbar with the lure
 
 FISHING_IMPOSSIBLE_KEYWORDS = ['Tady', 'nemůžeš', 'lovit', 'ryby']
 FISHING_NO_LURE_KEYWORDS = ['žádnou', 'Pokud', 'chceš', 'chytat', 'ryby', 'musíš', 'použít', 'návnadu']
 FISHING_FISH_ON_KEYWORDS = ['Vypadá', 'to', 'že', 'právě', 'zabírá', 'na']
+FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'je', 'fuč']
 
 # Fish names, and the time required to wait for a successful catch
 FISHING_0S_FISH = ['Pstruh říční', 'Koruška', 'Nožík']
@@ -45,10 +46,12 @@ FISHING_3S_FISH = ['Candát', 'Mandarínová ryba', 'Kapr', 'Losos', 'Amur bíl�
     'Požehnaný pergamen', 'Malá ryba']
 FISHING_5S_FISH = ['Velký candát', 'Kapr hladký', 'Zlatá rybka', 'Prut zlata (1kk)']
 FISHING_ALL_FISH = [FISHING_0S_FISH, FISHING_3S_FISH, FISHING_5S_FISH]
+
+# Fish wait time information
 FISHING_FISH_INFORMATION = [
     {'Fish names': FISHING_0S_FISH, 'Time': 0},
-    {'Fish names': FISHING_3S_FISH, 'Time': 3},
-    {'Fish names': FISHING_5S_FISH, 'Time': 5},
+    {'Fish names': FISHING_3S_FISH, 'Time': 4},
+    {'Fish names': FISHING_5S_FISH, 'Time': 6},
 ]
 
 
@@ -57,7 +60,6 @@ FISHING_FISH_INFORMATION = [
 # Game launcher window coordinates
 LAUNCHER_NAME_COORD = [0.460, 0.698, 0.606, 0.745] # For text reading
 LAUNCHER_NAME_POS = [0.530, 0.715] # For clicking 
-LAUNCHER_PW_COORD = [] 
 LAUNCHER_PW_POS = [0.530, 0.785]
 LAUNCHER_START_POS = [0.530, 0.860]
 
@@ -67,6 +69,15 @@ MONITOR_LAUNCHER_DEFAULT_COORD = [0.233, 0.245, 0.660, 0.616] # Default coordina
 
 ### KEYS ###
 KEYS = {
+    '1':0x02,
+    '2':0x03,
+    '3':0x04,
+    '4':0x05,
+    '5':0x06,
+    '6':0x07,
+    '7':0x08,
+    '8':0x09,
+    '9':0x0A,
     'A':0x1E,
     'C':0x2E,
     'D':0x20,

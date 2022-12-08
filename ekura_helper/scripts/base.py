@@ -472,8 +472,6 @@ class InGameBot(Base):
         '''
         if not key in static.KEYS.keys():
             raise ValueError('This key cannot be pressed')
-        if key in self.numbers:
-            key = self.num_key(key) #Parse a roman number
         key_hx = static.KEYS.get(key) 
         PressKey(key_hx)
         time.sleep(1)
