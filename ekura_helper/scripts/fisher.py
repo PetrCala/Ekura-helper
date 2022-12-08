@@ -30,6 +30,11 @@ class classproperty(property):
         return classmethod(self.fget).__get__(None, owner)()
 
 class Fisher(InGameBot):
+    '''A class for automatic fishing. Assumes you have the fishing rod equipped.
+
+    Args:
+        InGameBot (_type_): _description_
+    '''
     def __init__(self, char_name:str, *args, **kwargs):
         '''Constructor for the Fisher class. Game must be running in order for the
             constructor to be callable.
@@ -46,3 +51,24 @@ class Fisher(InGameBot):
         '''Main method of the Miner clsass
         '''
         pass
+
+
+    def prepareForFishing(self):
+        '''Check all the necessary requirements to start fishing.
+        '''
+        self.focusedInput('SPACE')
+        time.sleep(1)
+        msg = self.readTextInRange(static.MESSAGE_LOG_COORD, view_range=False)
+        print(msg)
+        pass
+
+    def fish(self):
+        '''Assuming all fishing requirements were fulfilled, put on a bait
+        and start fishing. Return True if the fishing was successful, and
+        False otherwise.
+        '''
+        pass
+
+
+
+    

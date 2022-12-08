@@ -81,7 +81,7 @@ class Miner(InGameBot):
         '''Check whether the mining has yet finished. If so, set the 'mining_finished'
         attribute to True. Return True, if mining is finished, and False otherwise.
         '''
-        msg = self.readTextInRange(static.MINING_TEXT_COORD, view_range = False) # Read message log
+        msg = self.readTextInRange(static.MESSAGE_LOG_COORD, view_range = False) # Read message log
         ore_gone = self.checkStringForMatches(msg, static.MINING_IMPOSSIBLE_KEYWORDS, verbose = False)
         matches = self.checkStringForMatches(msg, static.MINING_DONE_KEYWORDS, verbose = False)
         if ore_gone > 1: # Check whether the node had not disappeared yet

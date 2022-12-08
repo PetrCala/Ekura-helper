@@ -395,10 +395,9 @@ class InGameBot(Base):
         '''
         # Variables
         self.char_name = char_name
-        # Attributes
-        self.screen_pos = self.getGameCoords() # Function defaults to game window
         # Constructor operations
-        super(InGameBot, self).__init__(*args, **kwargs) # Master class inheritance
+        game_hwnd = self.getGameHwnd()
+        super(InGameBot, self).__init__(hwnd = game_hwnd, *args, **kwargs) # Master class inheritance
         self.validateGamePos() # Verify that the game can be located
 
     @property
@@ -502,10 +501,10 @@ class InGameBot(Base):
             self.focusGame()
         else:
             win32gui.SetForegroundWindow(window_hwnd)
-        if len(input) > 1:
-            self.useKeysInGame(input)
-        else:
+        if input in static.KEYS.keys(): # Single input
             self.useKeyInGame(input)
+        else:
+            self.useKeysInGame(input)
         win32gui.SetForegroundWindow(active_hwnd) # Return focus
         return True
 
