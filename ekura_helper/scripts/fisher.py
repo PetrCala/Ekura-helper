@@ -111,6 +111,10 @@ class Fisher(InGameBot):
             time.sleep(0.2) # Allow for proper input
             print('No bait is on. Putting on bait...')
             self.focusedInput(static.FISHING_LURE_SLOT) # Put on lure
+            lure_on = self.checkStringForMatches(msg, static.FISHING_LURE_ON_KEYWORDS, verbose = False)
+            if not lure_on > 0:
+                print('Failed to put the bait on. Fishing impossible.')
+                self.fishing_impossible = True
             return False
         self.fishing_impossible = False
         return True

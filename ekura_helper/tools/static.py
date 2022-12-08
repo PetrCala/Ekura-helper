@@ -36,6 +36,7 @@ FISHING_LURE_SLOT = '1' # Slot in the hotbar with the lure
 
 FISHING_IMPOSSIBLE_KEYWORDS = ['Tady', 'nemůžeš', 'lovit', 'ryby']
 FISHING_NO_LURE_KEYWORDS = ['žádnou', 'Pokud', 'chceš', 'chytat', 'ryby', 'musíš', 'použít', 'návnadu']
+FISHING_LURE_ON_KEYWORDS = ['Na', 'háčku', 'se', 'houpe']
 FISHING_FISH_ON_KEYWORDS = ['Vypadá', 'to', 'že', 'právě', 'zabírá', 'na']
 FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'fuč']
 FISHING_FISH_CAUGHT_KEYWORDS = ['Tvým', 'úlovkem', 'délce']
