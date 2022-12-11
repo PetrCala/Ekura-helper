@@ -11,6 +11,7 @@ import pytesseract #Text recognition
 import win32.win32gui as win32gui
 
 from scripts.base import Base, InGameBot
+from scripts.gui import GUI
 from scripts.launcher import Launcher
 from scripts.fisher import Fisher
 from scripts.miner import Miner
@@ -26,11 +27,11 @@ keyboard = Controller()
 def main():
     B = Base()
     # M = Miner(char_name = local_settings.CHAR_NAME)
-    F = Fisher(char_name = 'Stand')
-    L = Launcher()
+    # F = Fisher(char_name = 'Stand')
+    # L = Launcher()
+    G = GUI()
 
-    
-    test = F.convertExcelToDict(print_dict=True)
+    G.main()
     # F.main()
     # L.login()
 

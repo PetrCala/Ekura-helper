@@ -1,5 +1,6 @@
 ﻿# Static variables
-APP_NAME = 'Ekura miner'
+APP_NAME = 'Ekura helper'
+APP_FOLDER_NAME = 'Ekura-helper'
 GAME_WINDOW_NAME = 'Ekura(' # Used for window name lookup
 LAUNCHER_WINDOW_NAME = 'Ekura Launcher'
 LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
