@@ -27,7 +27,9 @@ def main():
     F = Fisher(char_name = 'Stand')
     L = Launcher()
 
-    F.main()
+    out = F.convertExcelToDict()
+    print(out)
+    # F.main()
     # L.login()
 
     # M.main() # Mine
