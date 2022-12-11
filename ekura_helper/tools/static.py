@@ -42,7 +42,8 @@ FISHING_FISH_GONE_KEYWORDS = ['A', 'úlovek', 'fuč']
 FISHING_FISH_CAUGHT_KEYWORDS = ['Tvým', 'úlovkem', 'délce']
 
 # Fish names, and the time required to wait for a successful catch
-FISHING_FISH_INFORMATION = [{'Fish name': 'Pstruh říční', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
+FISHING_FISH_INFORMATION = [
+    {'Fish name': 'Pstruh říční', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': 'Koruška', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': 'Candát', 'Average': 2.01, 'Min': 0.76, 'Max': 3.66},
     {'Fish name': 'Mandarínová ryba', 'Average': 1.50, 'Min': 1.12, 'Max': 1.81},
@@ -68,7 +69,8 @@ FISHING_FISH_INFORMATION = [{'Fish name': 'Pstruh říční', 'Average': 0.0, 'M
     {'Fish name': 'Velký candát', 'Average': 3.90, 'Min': 3.34, 'Max': 4.38},
     {'Fish name': 'Kapr hladký', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0},
     {'Fish name': 'Zlatá rybka', 'Average': 2.71, 'Min': 2.71, 'Max': 2.71},
-    {'Fish name': 'Prut zlata (1kk)', 'Average': 0.0, 'Min': 0.0, 'Max': 0.0}]
+    {'Fish name': 'Prut zlata (1kk)', 'Average': 0.0, 'Min': 0.0, 'Max': 1.0},
+]
 
 FISHING_BOT_TYPOS = {
     'Mandarinová ryba': 'Mandarínová ryba',

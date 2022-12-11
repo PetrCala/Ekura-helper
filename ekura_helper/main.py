@@ -2,7 +2,9 @@
 import sys
 import re
 import time
+from pathlib import Path
 
+import pandas as pd
 from ctypes import windll
 from pynput.keyboard import Key, HotKey, Controller
 import pytesseract #Text recognition
@@ -27,8 +29,8 @@ def main():
     F = Fisher(char_name = 'Stand')
     L = Launcher()
 
-    out = F.convertExcelToDict()
-    print(out)
+    
+    test = F.convertExcelToDict(print_dict=True)
     # F.main()
     # L.login()
 

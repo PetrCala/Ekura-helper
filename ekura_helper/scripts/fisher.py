@@ -6,6 +6,7 @@ import re
 import time
 import math
 import sys
+from os.path import exists
 from pathlib import Path
 
 from ctypes import windll
@@ -166,27 +167,6 @@ class Fisher(InGameBot):
                 f.write(f'Fish: {fish}, Wait time since message detection: {round(time,2)}s, Date: {datetime.now()}\n')
         return None
 
-    def convertExcelToDict(self):
-        '''Temporary method; delete when deploying.
-        Load the fish data and transform it into data as a dictionary in the format
-            {'Fish name': 'Losos', 'Average': 2.1, 'Min': 1.5, 'Max': 2.5}.
-        '''
-        result = []
-        path = str(Path().absolute()) + r'\notes\Fish data.xlsx'
-        data = pd.DataFrame(pd.read_excel(path, sheet_name = 'Fish summary'))
-        def convertRow(row):
-            out = {
-                'Fish name': row[0],
-                'Average': row[1],
-                'Min': row[2],
-                'Max': row[3]}
-            return out
-        for i in data.iterrows():
-            row = i[1]
-            transformed_data = convertRow(row)
-            result.append(transformed_data)
-        return result
-
     @staticmethod
     def readFishType(msg:str):
         '''Input the message with the fish on the rod, return an integer
@@ -219,5 +199,58 @@ class Fisher(InGameBot):
         max_ = max_ if max_ != 0.0 else wait_random # No data
         wait_time = random.uniform(min_ - min_/3, max_ + max_/3) # Add an offset to allow for data collection
         return round(wait_time, 2)
+
+    @staticmethod
+    def updateExcel():
+        '''Read the text data file, preprocess the data, and update the 'data' sheet
+        of the 'Fish data.xlsx' excel.
+        '''
+        abs_path = str(Path().absolute())
+        source_path = abs_path + r'\fish_stats.txt'
+        excel_path = abs_path + r'\notes\Fish data.xlsx'
+        if not (exists(source_path) and exists(excel_path)):
+            raise FileExistsError('A file has been misplaced.')
+        with open(source_path) as f:
+            source = f.readlines()
+        out = []
+        reg_ = 'Fish: (.*), Wait time since message detection: (.*)s, Date: (.*)'
+        for fish_text in source:
+            match = re.match(reg_, fish_text)
+            temp_dict = {
+                'Fish name': str(match[1]), 
+                'Wait time': float(match[2]),
+                'Date': pd.to_datetime(match[3]),
+                }
+            out.append(temp_dict)
+        fish_df = pd.DataFrame(out)
+        abs_path = str(Path().absolute())
+        excel_path = abs_path + r'\notes\Fish data.xlsx'
+        fish_df.to_excel(excel_path, sheet_name = 'Data', index = False)
+        return source
+
+    @staticmethod
+    def convertExcelToDict(print_dict:bool=True):
+        '''Load the fish data and transform it into data as a dictionary in the format
+            {'Fish name': 'Losos', 'Average': 2.1, 'Min': 1.5, 'Max': 2.5}.
+        :arg:
+            print_dict(bool) - If True, print out the dictionary into the console.
+        '''
+        result = []
+        path = str(Path().absolute()) + r'\notes\Fish analysis.xlsx'
+        data = pd.DataFrame(pd.read_excel(path, sheet_name = 'Fish summary'))
+        def convertRow(row):
+            out = {
+                'Fish name': row[0],
+                'Average': round(row[1],2),
+                'Min': round(row[2], 2),
+                'Max': round(row[3], 2)}
+            return out
+        for i in data.iterrows():
+            row = i[1]
+            transformed_data = convertRow(row)
+            result.append(transformed_data)
+            if print_dict:
+                print(transformed_data,',', sep = '')
+        return result
 
         
