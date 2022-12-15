@@ -27,15 +27,15 @@ keyboard = Controller()
 def main():
     B = Base()
     # M = Miner(char_name = local_settings.CHAR_NAME)
-    # F = Fisher(char_name = 'Stand')
+    F = Fisher(char_name = 'Stand')
     # L = Launcher()
-    G = GUI()
+    # G = GUI()
 
-    G.main()
-    # F.main()
+    # G.main()
+    F.main()
     # L.login()
 
     # M.main() # Mine
 
 if __name__ == '__main__':
-    main()
+    main() 
