@@ -32,7 +32,8 @@ def main():
     # G = GUI()
 
     # G.main()
-    F.main()
+    F.convertExcelToDict()
+    # F.main()
     # L.login()
 
     # M.main() # Mine
