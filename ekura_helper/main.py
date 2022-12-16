@@ -17,8 +17,8 @@ from scripts.fisher import Fisher
 from scripts.miner import Miner
 from scripts.screenalysis import Screenalysis
 from tools import static
-from tools import local_settings
-from tools.directKeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from tools import localsettings
+from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
