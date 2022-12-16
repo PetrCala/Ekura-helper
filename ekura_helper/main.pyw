@@ -27,12 +27,12 @@ keyboard = Controller()
 def main():
     B = Base()
     # M = Miner(char_name = local_settings.CHAR_NAME)
-    F = Fisher(char_name = 'Stand')
+    # F = Fisher(char_name = 'Stand')
     # L = Launcher()
-    # G = GUI()
+    G = GUI()
 
-    # G.main()
-    F.convertExcelToDict()
+    G.main()
+    # F.convertExcelToDict()
     # F.main()
     # L.login()
 
