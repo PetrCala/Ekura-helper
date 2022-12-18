@@ -25,16 +25,16 @@ pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract pa
 keyboard = Controller()
 
 def main():
-    B = Base()
-    # M = Miner(char_name = local_settings.CHAR_NAME)
-    # F = Fisher(char_name = 'Stand')
-    # L = Launcher()
     G = GUI()
-
     G.main()
+
+    # M = Miner(char_name = localsettings.CHAR_NAME)
+    # F = Fisher(char_name = 'Stand')
     # F.convertExcelToDict()
     # F.main()
-    # L.login()
+
+    # L = Launcher()
+    # L.launch('Bloodbath')
 
     # M.main() # Mine
 

@@ -7,23 +7,144 @@ from datetime import datetime
 
 import PySimpleGUI as sg
 
+from scripts.launcher import Launcher
+from scripts.fisher import Fisher
+from scripts.miner import Miner
 from tools import guitools as gt
 from tools import static
+from tools import localsettings
 
 class GUI:
     '''Graphical user interface
     '''
     def __init__(self):
-        #Defining file paths
-        self.base_path = str(os.getcwd())
-        self.theme = 'LightGrey1'
-        # script_path = self.base_path + r'\scripts'
-        
-        # Path handling
-        if not static.APP_FOLDER_NAME in self.base_path:
-            raise SystemError('Folder name incorrect')
-        # if script_path not in sys.path:
-        #     sys.path.insert(0, script_path)
+        #File path handling
+        self.base_path = gt.handlePath()
+
+    def main(self):
+        '''The main method for initiating the graphical user interface
+        '''
+        main_w = self.mainWindow()
+
+        while True:
+            window, event, values = sg.read_all_windows()
+            #print(event, values)
+
+            #------ Main window events ------
+            if event in (sg.WINDOW_CLOSED, '-BACK-', 'Quit'):
+                window.close()
+                break
+
+            #------ Login events ------
+            elif event == '-EDIT-ACCOUNT-NAMES-':
+                pass
+
+            elif event == '-EDIT-CHARACTER-NAMES-':
+                pass
+
+            elif event == '-LAUNCH-GAME-ONLY-':
+                acc_name = values['-ACCOUNT-NAME-'][0]
+                print(acc_name)
+                self.launchGameOnly(acc_name)
+
+            elif event == '-LOGIN-ONLY':
+                char_name = values['-CHARACTER-NAME-'][0]
+                self.loginOnly(char_name)
+
+            elif event == '-LAUNCH-AND-LOGIN-':
+                acc_name = values['-ACCOUNT-NAME-'][0]
+                char_name = values['-CHARACTER-NAME-'][0]
+                self.launchAndLogin(acc_name, char_name)
+
+            #------ Timer events ------
+            elif event == '-START-TIMER-':
+                self.startTimer()
+
+            #------ Miner events -----
+
+            #----- Fisher events -----
+
+        return None
+
+    def mainWindow(self):
+        '''Open the main window of theGUI.
+        '''
+        sg.theme(static.GUI_THEME)
+        sg.set_options(font=(static.GUI_FONT,static.GUI_FONT_SIZE))
+
+
+        col_left_layout = [
+                [self.loginWindow()]
+            ]
+        col_middle_layout = [[sg.Frame(layout = [
+                    [sg.Text('hello')]
+                ],
+                title = 'Middle column')
+        ]]
+        col_right_layout = [[sg.Frame(layout = [
+                    [sg.Text('hello')]
+                ],
+                title = 'Right column')
+        ]]
+
+        col_left = gt.main_col(col_left_layout)
+        col_middle = gt.main_col(col_middle_layout)
+        col_right = gt.main_col(col_right_layout)
+
+        layout = [[col_left, col_middle, col_right]]
+
+        return sg.Window(static.APP_NAME, layout, size = (static.GUI_WIDTH,static.GUI_HEIGHT), finalize=True)
+
+    @staticmethod
+    def loginWindow():
+        '''Return the sg.Frame of the login window.
+        '''
+        frame = sg.Frame(layout=[
+                [sg.Text('Account name:', size = (14,1)),
+                 sg.Listbox(localsettings.ACCOUNT_LIST, default_values = localsettings.ACCOUNT_LIST[0], size = (18,1), key = '-ACCOUNT-NAME-'),
+                 sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
+                ],
+                [sg.Text('Character name:', size = (14,1)),
+                 sg.Listbox(localsettings.CHARACTER_LIST, default_values = localsettings.CHARACTER_LIST[0], size = (18,1), key = '-CHARACTER-NAME-'),
+                 sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
+                ],
+                [sg.Column([[
+                    sg.Button('Launch', key = '-LAUNCH-GAME-ONLY-'),
+                    sg.Button('Login', key = '-LOGIN-ONLY-'),
+                    sg.Button('Launch and login', key = '-LAUNCH-AND-LOGIN-')
+                    ]], justification = 'center')
+                ]
+            ]
+            ,title = 'Login'
+        )
+        return frame
+
+    @staticmethod
+    def launchGameOnly(acc_name:str):
+        '''Input the name of the account and launch the game with this account. No login.
+        Invoked with the '-LAUNCH-GAME-' keyword from the main GUI window.
+        '''
+        L = Launcher()
+        L.launch(acc_name)
+        return None
+    
+    @staticmethod
+    def loginOnly(char_name:str):
+        '''Input the name of the character and login with this character.
+        '''
+        L = Launcher()
+        L.login(char_name)
+        return None
+
+    @staticmethod
+    def launchAndLogin(acc_name:str, char_name:str):
+        '''Input the account name and the character name. Launch the game and login using
+        said information.
+        '''
+        L = Launcher()
+        L.launch(acc_name)
+        L.login(char_name)
+        return None
 
     @staticmethod
     def startTimer(timer_time:int=3600):
@@ -77,34 +198,4 @@ class GUI:
         if not cancelled:
             sg.Popup('Timer finished!')
         window.Close()
-        return None
-
-    def mainWindow(self):
-        '''Open the main window of theGUI.
-        '''
-        col1 = sg.Column([[sg.Text('1 hour timer:', size = (15,1), justification='left')],
-                            [sg.Button('Timer', key='-START-TIMER-')]])
-
-        layout = [[col1]]
-
-        sg.theme(self.theme)
-        sg.set_options(font=('Arial',10))
-        return sg.Window('Ekura helper', layout, size = (1080,820), finalize=True)
-
-    def main(self):
-        '''The main method for initiating the graphical user interface
-        '''
-        main_w = self.mainWindow()
-
-        while True:
-            window, event, values = sg.read_all_windows()
-            #print(event, values)
-
-            if event in (sg.WINDOW_CLOSED, '-BACK-', 'Quit'):
-                window.close()
-                break
-
-            elif event == '-START-TIMER-':
-                self.startTimer()
-
         return None

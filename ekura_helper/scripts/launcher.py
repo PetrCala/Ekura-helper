@@ -33,7 +33,7 @@ class Launcher(Base):
         pass
 
     def main(self):
-        self.login()
+        self.launch()
 
     @property
     def screen_pos(self):
@@ -68,7 +68,7 @@ class Launcher(Base):
         if hwnd is None:
             print('Could not open the launcher window')
             return False
-        time.sleep(2) # Wait for the launcher animations to finish
+        time.sleep(3) # Wait for the launcher animations to finish
         x_scale, y_scale = static.MONITOR_LAUNCHER_DEFAULT_COORD[0:2]
         [x_abs, y_abs] = self.calculateCoords([x_scale, y_scale], from_scale=True, screen_pos_=self.monitor_coords)
         width_ = int(self.screen_pos[2] - self.screen_pos[0])
@@ -86,12 +86,12 @@ class Launcher(Base):
         win32gui.CloseWindow(hwnd)
         return True
 
-    def correctNameEntered(self):
+    def correctNameEntered(self, acc_name:str):
         '''Check whether there is not already the correct name input by default.
         If yes, return this name, if not, return False.
         '''
         window_text = self.readTextInRange(static.LAUNCHER_NAME_COORD)
-        if local_settings.ACCOUNT_NAME in window_text:
+        if acc_name == window_text.strip():
             return True
         return False
 
@@ -105,16 +105,16 @@ class Launcher(Base):
         self.useKey(Key.ctrl, method='release', sleep=False)
         return True
 
-    def inputName(self):
-        '''Input the character name into the game launcher. Assumer the launcher is
+    def inputName(self, acc_name:str):
+        '''Input the account name into the game launcher. Assumer the launcher is
         already open. Return True, if the name was already correct, and False,
         if it had to be put in (focus is on the name window).
         '''
-        if self.correctNameEntered():
+        if self.correctNameEntered(acc_name):
             print('The correct name is already in the launcher.')
             return True
         self.deleteName() # Delete the faulty name
-        self.useKeys(local_settings.ACCOUNT_NAME) # Write the name
+        self.useKeys(acc_name) # Write the name
         return False
 
     def inputPassword(self):
@@ -123,17 +123,17 @@ class Launcher(Base):
         '''
         x_, y_ = static.LAUNCHER_PW_POS # Password window
         self.moveClick(x_, y_, from_scale=True)
-        self.useKeys(local_settings.ACCOUNT_PASSWORD)
+        self.useKeys(localsettings.ACCOUNT_PASSWORD)
         return True
 
-    def login(self):
+    def launch(self, acc_name:str):
         '''Input the name, password, and start the game. The game launcher window
         must be open already.
         '''
         if not self.checkLauncherOpen():
             self.openGameLauncher()
         self.focusGameLauncher() # Put game launcher window into foreground
-        self.inputName()
+        self.inputName(acc_name)
         self.inputPassword()
         self.useKey(Key.enter, sleep = False) # Press 'start game' (may be changed to click)
         return True
@@ -152,3 +152,10 @@ class Launcher(Base):
         '''
         hwnd = self.getLauncherHwnd()
         return win32gui.SetForegroundWindow(hwnd)
+    
+    def login(self, char_name:str):
+        '''Input the name of the character to login with, choose that character out of the
+        4 slots, and start the game with that character. Assume the character selection
+        window is already open.
+        '''
+        pass

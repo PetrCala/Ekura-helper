@@ -11,6 +11,13 @@ LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
 PYTESSERACT_PATH = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract' # 'tesseract' app in the Tesseract-OCR 
 TESSDATA_DIR_CONFIG = r'--tessdata-dir "C:\\Program Files (x86)\\Tesseract-OCR\\tessdata"' # "tessdata" folder in the Tesseract-OCR
 
+### GUI ###
+GUI_THEME = 'LightGrey1'
+GUI_FONT = 'Helvetica'
+GUI_FONT_SIZE = 10
+GUI_WIDTH = 1600
+GUI_HEIGHT = 900
+
 ### GAME ###
 
 # Game window coordinates

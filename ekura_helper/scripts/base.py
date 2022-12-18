@@ -449,7 +449,7 @@ class InGameBot(Base):
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
-        lookup_words = [static.GAME_WINDOW_NAME, local_settings.CHAR_NAME] # Game window name
+        lookup_words = [static.GAME_WINDOW_NAME, localsettings.CHAR_NAME] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')
