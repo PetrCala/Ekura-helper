@@ -18,12 +18,12 @@ import win32.win32gui as win32gui
 from scripts.base import Base
 from scripts.base import InGameBot
 from tools import static
-from tools import localsettings
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
+
 
 class classproperty(property):
     def __get__(self, cls, owner):

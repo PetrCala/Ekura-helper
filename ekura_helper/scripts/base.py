@@ -16,12 +16,14 @@ import pywintypes
 import win32.win32gui as win32gui
 
 from tools import static
-from tools import localsettings
+from tools.handler import readLocalData
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
+
+local_data = readLocalData()
 
 class classproperty(property):
     def __get__(self, cls, owner):
@@ -449,7 +451,7 @@ class InGameBot(Base):
     def getGameHwnd(self):
         '''Return the hwnd of the main game window. If not open, throw a system error.
         '''
-        lookup_words = [static.GAME_WINDOW_NAME, localsettings.CHAR_NAME] # Game window name
+        lookup_words = [static.GAME_WINDOW_NAME, local_data.get('CHAR_NAME')] # Game window name
         hwnd = self.getWindowHwnd(lookup_words)
         if hwnd is None:
             raise SystemError('The game is not running. Start the game first')

@@ -17,12 +17,14 @@ import win32.win32gui as win32gui
 
 from scripts.base import Base
 from tools import static
-from tools import localsettings
+from tools.handler import readLocalData
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
 keyboard = Controller()
+
+local_data = readLocalData()
 
 class classproperty(property):
     def __get__(self, cls, owner):
@@ -123,7 +125,7 @@ class Launcher(Base):
         '''
         x_, y_ = static.LAUNCHER_PW_POS # Password window
         self.moveClick(x_, y_, from_scale=True)
-        self.useKeys(localsettings.ACCOUNT_PASSWORD)
+        self.useKeys(local_data.get('ACCOUNT_PASSWORD'))
         return True
 
     def launch(self, acc_name:str):

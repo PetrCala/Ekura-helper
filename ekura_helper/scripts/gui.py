@@ -12,7 +12,9 @@ from scripts.fisher import Fisher
 from scripts.miner import Miner
 from tools import guitools as gt
 from tools import static
-from tools import localsettings
+from tools.handler import readLocalData
+
+local_data = readLocalData()
 
 class GUI:
     '''Graphical user interface
@@ -101,11 +103,13 @@ class GUI:
         '''
         frame = sg.Frame(layout=[
                 [sg.Text('Account name:', size = (14,1)),
-                 sg.Listbox(localsettings.ACCOUNT_LIST, default_values = localsettings.ACCOUNT_LIST[0], size = (18,1), key = '-ACCOUNT-NAME-'),
+                 sg.Listbox(local_data.get('ACCOUNT_LIST'), default_values = local_data.get('ACCOUNT_LIST')[0],
+                    size = (18,1), key = '-ACCOUNT-NAME-'),
                  sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
                 ],
                 [sg.Text('Character name:', size = (14,1)),
-                 sg.Listbox(localsettings.CHARACTER_LIST, default_values = localsettings.CHARACTER_LIST[0], size = (18,1), key = '-CHARACTER-NAME-'),
+                 sg.Listbox(local_data.get('CHARACTER_LIST'), default_values = local_data.get('CHARACTER_LIST')[0],
+                    size = (18,1), key = '-CHARACTER-NAME-'),
                  sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
                 ],
                 [sg.Column([[
