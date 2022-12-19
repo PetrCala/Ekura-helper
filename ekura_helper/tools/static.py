@@ -78,6 +78,7 @@ FISHING_BOT_TYPOS = {
     'Mandarinová ryba': 'Mandarínová ryba',
     'Mřénka': 'Mřenka',
     'Lolosová ryba': 'Lotosová ryba',
+    'Zlatý kíč': 'Zlatý klíč',
 }
 
 ### VARIOUS ###

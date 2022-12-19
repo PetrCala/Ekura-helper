@@ -129,6 +129,7 @@ class Base():
             screen_pos = self.screen_pos # Default to the whole screen
         if not len(screen_pos) == 4:
             raise ValueError('The screen_pos argument must be a list of length 4')
+        # Add OSError handling - screen grab failed
         screen = np.array(ImageGrab.grab(bbox=screen_pos))
         if color_scale == 'gray':
             return cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)

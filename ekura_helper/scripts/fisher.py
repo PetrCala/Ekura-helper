@@ -12,6 +12,7 @@ import pytesseract #Text recognition
 
 from scripts.base import InGameBot
 from tools import static
+from tools import settings
 from tools.handler import getTesseractPath
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
@@ -78,7 +79,8 @@ class Fisher(InGameBot):
                 print(f'Pulling up after {round(wait_time, 2)} seconds...')
                 self.focusedInput('SPACE') # Pull up
                 time.sleep(2)
-                self.handleCatchResults(fish = fishing_state, time = wait_time)
+                if settings.PRODUCTION is False:
+                    self.handleCatchResults(fish = fishing_state, time = wait_time)
                 time.sleep(2) # Wait for the animations to finish
                 self.fishing_finished = True
                 print('Fish pulling complete.')
@@ -172,7 +174,11 @@ class Fisher(InGameBot):
             fish_list.append(msg_parts[i])
         fish_type = ' '.join(fish_list)
         if fish_type in static.FISHING_BOT_TYPOS.keys():
+            typo = fish_type
             fish_type = static.FISHING_BOT_TYPOS.get(fish_type) # Get correct name
+            if settings.PRODUCTION is False:
+                with open('ekura_helper/notes/fishtypos.txt', 'a') as f:
+                    f.write(f'\'{typo}\': \'{fish_type}\',\n')
         return fish_type
 
     @staticmethod

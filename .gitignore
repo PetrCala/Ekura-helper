@@ -15,5 +15,6 @@ localdata.py
 
 # Custom files
 notes/
+ekura_helper/test.py
 fish_stats.txt
 Ekura helper.lnk

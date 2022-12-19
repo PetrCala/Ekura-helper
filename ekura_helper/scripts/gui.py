@@ -1,4 +1,5 @@
 ﻿import time
+import re
 
 import PySimpleGUI as sg
 
@@ -99,12 +100,12 @@ class GUI:
         '''
         frame = sg.Frame(layout=[
                 [sg.Text('Account name:', size = (14,1)),
-                 sg.Listbox(local_data.get('ACCOUNT_LIST'), default_values = local_data.get('ACCOUNT_LIST')[0],
+                 sg.Listbox(local_data.get('ACCOUNT_NAMES'), default_values = local_data.get('ACCOUNT_NAMES')[0],
                     size = (18,1), key = '-ACCOUNT-NAME-'),
                  sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
                 ],
                 [sg.Text('Character name:', size = (14,1)),
-                 sg.Listbox(local_data.get('CHARACTER_LIST'), default_values = local_data.get('CHARACTER_LIST')[0],
+                 sg.Listbox(local_data.get('CHARACTER_NAMES'), default_values = local_data.get('CHARACTER_NAMES')[0],
                     size = (18,1), key = '-CHARACTER-NAME-'),
                  sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
                 ],
@@ -125,7 +126,20 @@ class GUI:
         and allow the user to input new values. Close the window at the end,
         and return None.
         '''
-        pass
+        old_names = local_data.get('ACCOUNT_NAMES')
+        print(old_names)
+        def_text = 'Account1, Account2, ...' if old_names is None else old_names
+        msg = f'Insert new account names in the specified format.\nCurrent account names: {old_names}'
+        new_names = sg.popup_get_text(message=msg, title='Edit Account Names', default_text=def_text,
+            grab_anywhere=True, keep_on_top=False)
+        validation_regex = r'^\S[\w ]+(?:, \S[\w ]+)*$'
+        new_names_validation = re.match(validation_regex, new_names)
+        if not new_names_validation: # Invalid pattern
+            print(f'\"{new_names}\" is an invalid input.\nPlease enter the account names in the format \"Acc1, Acc2\", and so on.')
+            return False
+        modifyLocalData('ACCOUNT_NAMES', new_names)
+        print(f'Account names changed to \"{new_names}\"')
+        return True
 
     @staticmethod
     def editCharacterNames():
