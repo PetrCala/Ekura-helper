@@ -11,7 +11,7 @@ dist/
 *.spec
 
 # Local settings
-local_settings.py
+localdata.py
 
 # Custom files
 notes/
