@@ -1,5 +1,4 @@
 ﻿import os
-import gzip, pickle
 
 import unittest
 

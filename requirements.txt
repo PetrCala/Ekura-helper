@@ -4,7 +4,8 @@ pandas>=1.5.2
 Pillow>=9.3.0
 opencv-python>=4.5.5.64 #cv2
 pynput>=1.7.6
-pytesseract>=0.3.9
+pytesseract>=0.3.9 # Screen capture
 pypiwin32==223
 pywin32==305 #win32gui
-PySimpleGUI>=4.60.4
+PySimpleGUI>=4.60.4 # GUI
+pyinstaller>=5.7.0

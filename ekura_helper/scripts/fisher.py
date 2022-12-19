@@ -1,30 +1,21 @@
-﻿import numpy as np
-import pandas as pd
+﻿import pandas as pd
 import random
 from datetime import datetime, timedelta
 import re
 import time
-import math
-import sys
 from os.path import exists
 from pathlib import Path
 
 from ctypes import windll
-import cv2
-from PIL import ImageGrab
-from cv2 import mean #Capturing screen
-from pynput.keyboard import Key, HotKey, Controller
+from pynput.keyboard import Controller
 import pytesseract #Text recognition
-import pywintypes
-import win32.win32gui as win32gui
 
-from scripts.base import Base
 from scripts.base import InGameBot
 from tools import static
-from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from tools.handler import getTesseractPath
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = getTesseractPath() # Pytesseract path
 keyboard = Controller()
 
 

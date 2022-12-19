@@ -6,6 +6,9 @@ __pycache__/
 # Build files and venv
 .venv/
 .conda/
+build/
+dist/
+*.spec
 
 # Local settings
 local_settings.py

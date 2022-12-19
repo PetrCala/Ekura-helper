@@ -17,10 +17,11 @@ import win32.win32gui as win32gui
 
 from scripts.base import Base
 from tools import static
+from tools.handler import getTesseractPath
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = getTesseractPath() # Pytesseract path
 keyboard = Controller()
 
 class Screenalysis(Base):

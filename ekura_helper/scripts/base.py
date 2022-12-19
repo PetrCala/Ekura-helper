@@ -1,6 +1,5 @@
 ﻿import numpy as np
 import random
-from datetime import datetime, timedelta
 import re
 import time
 import math
@@ -9,18 +8,16 @@ import sys
 from ctypes import windll
 import cv2
 from PIL import ImageGrab
-from cv2 import mean #Capturing screen
-from pynput.keyboard import Key, HotKey, Controller
+from pynput.keyboard import Controller
 import pytesseract #Text recognition
-import pywintypes
 import win32.win32gui as win32gui
 
 from tools import static
-from tools.handler import readLocalData
+from tools.handler import readLocalData, getTesseractPath
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = getTesseractPath() # Pytesseract path
 keyboard = Controller()
 
 local_data = readLocalData()
@@ -114,7 +111,8 @@ class Base():
         img = self.createScreen(range_pixels, color_scale='orig')
         if view_range:
             self.openScreen(range_pixels, color_scale = 'orig')
-        return pytesseract.image_to_string(img, lang = lang, config = static.TESSDATA_DIR_CONFIG)
+        config_file = getTesseractPath(file='conf') # Fetch the tesseract configuration file
+        return pytesseract.image_to_string(img, lang = lang, config = config_file)
 
     def createScreen(self, screen_pos:list = None, color_scale = 'gray'):
         '''Return a numpy array representing pixels on a screen. Specify the range

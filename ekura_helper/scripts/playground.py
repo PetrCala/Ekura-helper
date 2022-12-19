@@ -1,20 +1,16 @@
-import os
-import sys
-
 from ctypes import windll
-from pynput.keyboard import Key, HotKey, Controller
+from pynput.keyboard import Controller
 import pytesseract #Text recognition
-import win32.win32gui as win32gui
 
 from scripts.base import Base
 from scripts.launcher import Launcher
 from scripts.miner import Miner
 from scripts.screenalysis import Screenalysis
 from tools import static
-from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
+from tools.handler import getTesseractPath
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
-pytesseract.pytesseract.tesseract_cmd = static.PYTESSERACT_PATH # Pytesseract path
+pytesseract.pytesseract.tesseract_cmd = getTesseractPath() # Pytesseract path
 keyboard = Controller()
 
 def test():

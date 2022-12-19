@@ -1,9 +1,4 @@
-﻿import sys
-import os
-import re
-import numpy as np
-import time
-from datetime import datetime
+﻿import time
 
 import PySimpleGUI as sg
 
@@ -12,7 +7,7 @@ from scripts.fisher import Fisher
 from scripts.miner import Miner
 from tools import guitools as gt
 from tools import static
-from tools.handler import readLocalData
+from tools.handler import readLocalData, modifyLocalData
 
 local_data = readLocalData()
 
@@ -39,14 +34,13 @@ class GUI:
 
             #------ Login events ------
             elif event == '-EDIT-ACCOUNT-NAMES-':
-                pass
+                self.editAccountNames()
 
             elif event == '-EDIT-CHARACTER-NAMES-':
-                pass
+                self.editCharacterNames()
 
             elif event == '-LAUNCH-GAME-ONLY-':
                 acc_name = values['-ACCOUNT-NAME-'][0]
-                print(acc_name)
                 self.launchGameOnly(acc_name)
 
             elif event == '-LOGIN-ONLY':
@@ -122,6 +116,21 @@ class GUI:
             ,title = 'Login'
         )
         return frame
+
+    @staticmethod
+    def editAccountNames():
+        '''Open up a popup window, display the current list of account names,
+        and allow the user to input new values. Close the window at the end,
+        and return None.
+        '''
+        pass
+
+    @staticmethod
+    def editCharacterNames():
+        '''Similar to editAccountNames, only modify character names instead of 
+        account names
+        '''
+        pass
 
     @staticmethod
     def launchGameOnly(acc_name:str):

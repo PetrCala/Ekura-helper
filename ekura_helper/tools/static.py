@@ -5,12 +5,6 @@ GAME_WINDOW_NAME = 'Ekura(' # Used for window name lookup
 LAUNCHER_WINDOW_NAME = 'Ekura Launcher'
 LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
 
-
-# Pytesseract variables (read more here https://pypi.org/project/pytesseract/)
-# Tesseract-OCR installer at https://github.com/UB-Mannheim/tesseract/wiki
-PYTESSERACT_PATH = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract' # 'tesseract' app in the Tesseract-OCR 
-TESSDATA_DIR_CONFIG = r'--tessdata-dir "C:\\Program Files (x86)\\Tesseract-OCR\\tessdata"' # "tessdata" folder in the Tesseract-OCR
-
 ### GUI ###
 GUI_THEME = 'LightGrey1'
 GUI_FONT = 'Helvetica'
