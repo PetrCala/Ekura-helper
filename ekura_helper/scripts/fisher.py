@@ -49,11 +49,17 @@ class Fisher(InGameBot):
         '''Main method of the Miner clsass
         '''
         while True:
-            fishing_count = 0
-            self.fishing_impossible = False # Allow for fishing to start
-            while (not self.fishing_impossible) and (fishing_count <= 10):
-                self.fish()
-                fishing_count += 1
+            self.fishAWhile()
+
+    def fishAWhile(self):
+        '''Perform several catches. Stop after a while.
+        '''
+        fishing_count = 0
+        self.fishing_impossible = False # Allow for fishing to start
+        while (not self.fishing_impossible) and (fishing_count <= 10):
+            self.fish()
+            fishing_count += 1
+        return True
 
     def fish(self):
         '''Assuming all fishing requirements were fulfilled, start fishing.
@@ -177,7 +183,7 @@ class Fisher(InGameBot):
             typo = fish_type
             fish_type = static.FISHING_BOT_TYPOS.get(fish_type) # Get correct name
             if settings.PRODUCTION is False:
-                with open('ekura_helper/notes/fishtypos.txt', 'a') as f:
+                with open('notes/fishtypos.txt', 'a') as f:
                     f.write(f'\'{typo}\': \'{fish_type}\',\n')
         return fish_type
 

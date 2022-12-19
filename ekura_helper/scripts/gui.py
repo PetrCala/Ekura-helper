@@ -12,7 +12,7 @@ from tools.handler import validateLocalDataExistence, readLocalData, modifyLocal
 
 #----- Handle local data ----
 validateLocalDataExistence()
-local_data = readLocalData()
+local_data = readLocalData() 
 
 class GUI:
     '''Graphical user interface
@@ -37,23 +37,25 @@ class GUI:
 
             #------ Login events ------
             elif event == '-EDIT-ACCOUNT-NAMES-':
-                self.editAccountNames()
+                new_names_list = gt.editAccountNames()
+                window['-ACCOUNT-NAMES-'].update(new_names_list)
 
             elif event == '-EDIT-CHARACTER-NAMES-':
-                self.editCharacterNames()
+                new_names_list = gt.editCharacterNames()
+                window['-CHARACTER-NAMES-'].update(new_names_list)
 
             elif event == '-LAUNCH-GAME-ONLY-':
-                acc_name = values['-ACCOUNT-NAME-'][0]
-                self.launchGameOnly(acc_name)
+                acc_name = values['-ACCOUNT-NAMES-'][0]
+                gt.launchGameOnly(acc_name)
 
             elif event == '-LOGIN-ONLY':
-                char_name = values['-CHARACTER-NAME-'][0]
-                self.loginOnly(char_name)
+                char_name = values['-CHARACTER-NAMES-'][0]
+                gt.loginOnly(char_name)
 
             elif event == '-LAUNCH-AND-LOGIN-':
                 acc_name = values['-ACCOUNT-NAME-'][0]
                 char_name = values['-CHARACTER-NAME-'][0]
-                self.launchAndLogin(acc_name, char_name)
+                gt.launchAndLogin(acc_name, char_name)
 
             #------ Timer events ------
             elif event == '-START-TIMER-':
@@ -62,6 +64,12 @@ class GUI:
             #------ Miner events -----
 
             #----- Fisher events -----
+            elif event == '-START-FISHING-':
+                char_name = values['-CHARACTER-NAMES-'][0]
+                gt.startFishing(char_name)
+
+            elif event == '-STOP-FISHING-':
+                gt.stopFishing()
 
         return None
 
@@ -76,14 +84,15 @@ class GUI:
                 [self.loginWindow()]
             ]
         col_middle_layout = [[sg.Frame(layout = [
-                    [sg.Text('hello')]
+                    [gt.output_window()]
                 ],
-                title = 'Middle column')
+                title = 'Output')
         ]]
         col_right_layout = [[sg.Frame(layout = [
-                    [sg.Text('hello')]
+                    [sg.Button('Fish', key = '-START-FISHING-'),
+                     sg.Button('Stop', key = '-STOP-FISHING-')]
                 ],
-                title = 'Right column')
+                title = 'Fishing')
         ]]
 
         col_left = gt.main_col(col_left_layout)
@@ -101,12 +110,12 @@ class GUI:
         frame = sg.Frame(layout=[
                 [sg.Text('Account name:', size = (14,1)),
                  sg.Listbox(local_data.get('ACCOUNT_NAMES'), default_values = local_data.get('ACCOUNT_NAMES')[0],
-                    size = (18,1), key = '-ACCOUNT-NAME-'),
+                    size = (18,1), key = '-ACCOUNT-NAMES-'),
                  sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
                 ],
                 [sg.Text('Character name:', size = (14,1)),
                  sg.Listbox(local_data.get('CHARACTER_NAMES'), default_values = local_data.get('CHARACTER_NAMES')[0],
-                    size = (18,1), key = '-CHARACTER-NAME-'),
+                    size = (18,1), key = '-CHARACTER-NAMES-'),
                  sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
                 ],
                 [sg.Column([[
@@ -119,61 +128,6 @@ class GUI:
             ,title = 'Login'
         )
         return frame
-
-    @staticmethod
-    def editAccountNames():
-        '''Open up a popup window, display the current list of account names,
-        and allow the user to input new values. Close the window at the end,
-        and return None.
-        '''
-        old_names = local_data.get('ACCOUNT_NAMES')
-        print(old_names)
-        def_text = 'Account1, Account2, ...' if old_names is None else old_names
-        msg = f'Insert new account names in the specified format.\nCurrent account names: {old_names}'
-        new_names = sg.popup_get_text(message=msg, title='Edit Account Names', default_text=def_text,
-            grab_anywhere=True, keep_on_top=False)
-        validation_regex = r'^\S[\w ]+(?:, \S[\w ]+)*$'
-        new_names_validation = re.match(validation_regex, new_names)
-        if not new_names_validation: # Invalid pattern
-            print(f'\"{new_names}\" is an invalid input.\nPlease enter the account names in the format \"Acc1, Acc2\", and so on.')
-            return False
-        modifyLocalData('ACCOUNT_NAMES', new_names)
-        print(f'Account names changed to \"{new_names}\"')
-        return True
-
-    @staticmethod
-    def editCharacterNames():
-        '''Similar to editAccountNames, only modify character names instead of 
-        account names
-        '''
-        pass
-
-    @staticmethod
-    def launchGameOnly(acc_name:str):
-        '''Input the name of the account and launch the game with this account. No login.
-        Invoked with the '-LAUNCH-GAME-' keyword from the main GUI window.
-        '''
-        L = Launcher()
-        L.launch(acc_name)
-        return None
-    
-    @staticmethod
-    def loginOnly(char_name:str):
-        '''Input the name of the character and login with this character.
-        '''
-        L = Launcher()
-        L.login(char_name)
-        return None
-
-    @staticmethod
-    def launchAndLogin(acc_name:str, char_name:str):
-        '''Input the account name and the character name. Launch the game and login using
-        said information.
-        '''
-        L = Launcher()
-        L.launch(acc_name)
-        L.login(char_name)
-        return None
 
     @staticmethod
     def startTimer(timer_time:int=3600):
