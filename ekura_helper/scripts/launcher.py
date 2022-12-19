@@ -7,12 +7,14 @@ import win32.win32gui as win32gui
 
 from scripts.base import Base
 from tools import static
-from tools.handler import readLocalData, getTesseractPath
+from tools.handler import validateLocalDataExistence, readLocalData, getTesseractPath
 
 windll.user32.SetProcessDPIAware() #Make windll properly aware of your hardware
 pytesseract.pytesseract.tesseract_cmd = getTesseractPath() # Pytesseract path
 keyboard = Controller()
 
+#----- Handle local data ----
+validateLocalDataExistence()
 local_data = readLocalData()
 
 class classproperty(property):

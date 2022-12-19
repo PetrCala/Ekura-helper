@@ -1,31 +1,35 @@
-﻿import gzip, pickle
+﻿import os
+import sys
+import gzip, pickle
 from pathlib import Path
 
 def validateLocalDataExistence():
     '''Check for the existence of the local data file. If it is missing,
     create the file, with an empty dictionary inside.
     '''
-    local_data_path = 'ekura_helper/tools/localdata.py'
-    if not Path(local_data_path).is_file():
-        local_data_temp = {}
-        with gzip.open(local_data_path, 'wb') as f:
-            pickle.dump(local_data_temp, f)
+    path = str(Path().absolute()) + r'\ekura_helper\tools\localdata.py'
+    if not Path(path).is_file():
+        dummy_data = {'ACCOUNT_LIST': [''], 'CHARACTER_LIST': ['']}
+        with gzip.open(path, 'wb') as f:
+            pickle.dump(dummy_data, f)
     return None
 
 def writeLocalData(data, path:str = None):
     '''Input an object and rewrite the local data file with this object.
     Return None.
     '''
-    data_path = 'ekura_helper/tools/localdata.py' if path is None else path
-    with gzip.open(data_path, 'wb') as f:
+    if path is None:
+        path = str(Path().absolute()) + r'\ekura_helper\tools\localdata.py'
+    with gzip.open(path, 'wb') as f:
         pickle.dump(data, f)
     return None
 
 def readLocalData(path:str = None):
     '''Read the local data file and return its contents.
     '''
-    data_path = 'ekura_helper/tools/localdata.py' if path is None else path
-    with gzip.open(data_path, 'rb') as f:
+    if path is None:
+        path = str(Path().absolute()) + r'\ekura_helper\tools\localdata.py'
+    with gzip.open(path, 'rb') as f:
         data = pickle.load(f)
     return data
 

@@ -7,8 +7,10 @@ from scripts.fisher import Fisher
 from scripts.miner import Miner
 from tools import guitools as gt
 from tools import static
-from tools.handler import readLocalData, modifyLocalData
+from tools.handler import validateLocalDataExistence, readLocalData, modifyLocalData
 
+#----- Handle local data ----
+validateLocalDataExistence()
 local_data = readLocalData()
 
 class GUI:
