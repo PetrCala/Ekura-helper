@@ -6,7 +6,7 @@ LAUNCHER_WINDOW_NAME = 'Ekura Launcher'
 LAUNCHER_APP_NAME = 'Ekura' # Used to find the launcher in the windows search
 
 ### GUI ###
-GUI_THEME = 'LightGrey1'
+GUI_THEME = 'DarkGrey14'
 GUI_FONT = 'Helvetica'
 GUI_FONT_SIZE = 10
 GUI_WIDTH = 1600

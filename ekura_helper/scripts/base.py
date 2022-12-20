@@ -13,6 +13,7 @@ import pytesseract #Text recognition
 import win32.win32gui as win32gui
 
 from tools import static
+from tools import settings
 from tools.handler import validateLocalDataExistence,  readLocalData, getTesseractPath
 from tools.directkeys import click, queryMousePosition, PressKey, ReleaseKey, moveMouseTo
 
@@ -175,7 +176,8 @@ class Base():
             [list]: A list of the coordinates where the match was found
         '''
         assert any(isinstance(i, list) for i in rgb), 'The argument must be a nested list'
-        print(f'Searching for pixels...')
+        if not settings.PRODUCTION:
+            print(f'Searching for pixels...')
         if range_coords is None:
             range_coords = self.screen_pos
         screen = self.createScreen(screen_pos = range_coords, color_scale = 'orig') #Take a snapshot of the range/screen
@@ -188,9 +190,10 @@ class Base():
                 pixel_rgb = screen[y,x].tolist()
                 if pixel_rgb in rgb:
                     match_list.append([x,y])
-        search_time = round(time.time() - start_time, 2)
-        match_count = len(match_list)
-        print(f'Found {match_count} matching pixels.\nThe search took {search_time} seconds.')
+        if not settings.PRODUCTION:
+            search_time = round(time.time() - start_time, 2)
+            match_count = len(match_list)
+            print(f'Found {match_count} matching pixels.\nThe search took {search_time} seconds.')
         return match_list
 
     def getMousePosition(self, scale = False, verb = False):
@@ -417,8 +420,9 @@ class InGameBot(Base):
     def validateGamePos(self):
         '''Check that the game window is in a position where all important inputs can be read.
         '''
-        print('Validating game position...')
-        start_time = time.time()
+        if not settings.PRODUCTION:
+            print('Validating game position...')
+            start_time = time.time()
         screen_pos = self.screen_pos # Actual game position
         monitor_pos = self.monitor_coords # Monitor position
         x_verify, y_verify = [], [] # Coordinates to be verified
@@ -434,8 +438,9 @@ class InGameBot(Base):
         if not x_valid and y_valid:
             raise SystemError('Some crucial parts of the game window are hidden. Please recenter the game window.')
         # Possibly move the game automatically to a pre-defined location, if it makes more sense
-        validation_time = round(time.time() - start_time, 2)
-        print(f'The game position is valid. The validation took {validation_time} seconds.')
+        if not settings.PRODUCTION:
+            validation_time = round(time.time() - start_time, 2)
+            print(f'The game position is valid. The validation took {validation_time} seconds.')
         return True
         
     def getGameCoords(self):

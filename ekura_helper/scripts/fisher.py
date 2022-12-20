@@ -38,9 +38,7 @@ class Fisher(InGameBot):
             char_name (str): Name of the character which shall be operated by the bot.
         '''
         # Attributes
-        self.fishing_impossible = True
-        self.fishing_finished = True
-        self.check_interval = 1 # Float, amount of time to wait before checking fishing state
+        self.check_interval = 0.5 # Float, amount of time to wait before checking fishing state
         self.fishing_timer = datetime.now() + timedelta(days = -1)
         # Constructor operations
         super(Fisher, self).__init__(char_name, *args, **kwargs) # Master class inheritance
@@ -49,7 +47,115 @@ class Fisher(InGameBot):
         '''Main method of the Miner clsass
         '''
         while True:
-            self.fishAWhile()
+            if settings.PRODUCTION:
+                state = self.checkFishingState()
+                self.handleFishingState(state)
+                time.sleep(self.check_interval)
+            else:
+                self.fishAWhile()
+
+
+    def checkFishingState(self):
+        '''Check the state of fishing and return an integer identifying said state.
+        Game must be open.
+        :legend:
+            No message:
+            0 - Fishing ongoing, or not fishing
+            With message:
+            1 - Fish escaped
+            2 - Fish caught successfully
+            3 - Fish on
+            4 - Bait on
+            5 - No bait on
+            6 - Fishing impossible in this area
+        '''
+        msg = self.readTextInRange(static.MESSAGE_LOG_COORD, view_range=False)
+        if self.checkStringForMatches(msg, static.FISHING_FISH_GONE_KEYWORDS) > 1:
+            return 1
+        if self.checkStringForMatches(msg, static.FISHING_FISH_CAUGHT_KEYWORDS, verbose = False) > 1:
+            return 2
+        if self.checkStringForMatches(msg, static.FISHING_FISH_ON_KEYWORDS, verbose = False) > 0:
+            return 3
+        if self.checkStringForMatches(msg, static.FISHING_LURE_ON_KEYWORDS, verbose = False) > 0:
+            return 4
+        if self.checkStringForMatches(msg, static.FISHING_NO_LURE_KEYWORDS, verbose = False) > 1:
+            return 5
+        if self.checkStringForMatches(msg, static.FISHING_IMPOSSIBLE_KEYWORDS, verbose = False) > 0:
+            return 6
+        return 0
+
+    def handleFishingState(self, state:int, old_fish_timer):
+        '''Take action based on the fishing state information.
+        If the fishing is continuing well, return True.
+        If the fishing is further impossible and should be terminated, return False.
+        Also return a timestamp of now, if fishing was initiated, otherwise return None.
+        :return:
+            outcome, new_fish_timer [bool, time]
+        '''
+        new_fish_timer = None
+        if state == 0:
+            new_fish_timer = self.tryFishing(old_fish_timer)
+            if not settings.PRODUCTION:
+                print('Fish state checked...')
+        elif state == 6:
+            print('Fishing is impossible here.')
+            return False, new_fish_timer
+        elif state == 5:
+            print('You have no bait on the rod.\nPutting on a bait...')
+            bait_on = self.putOnBait()
+            if not bait_on: # Impossible to put on a bait
+                return False, new_fish_timer
+        elif state == 4:
+            print('Bait is on. Initiating fishing...')
+            if old_fish_timer - time.time() > 20:
+                self.focusedInput('SPACE')
+                new_fish_timer = time.time()
+        elif state == 3:
+            self.pullUp()
+        elif state == 2:
+            print('Fish caught successfully.')
+            time.sleep(1.5)
+            new_fish_timer = self.tryFishing(old_fish_timer)
+        elif state == 1:
+            print('Fish escaped.')
+            time.sleep(1.5)
+            new_fish_timer = self.tryFishing(old_fish_timer)
+        return True, new_fish_timer
+
+    def tryFishing(self, old_fish_timer):
+        '''Try to initate fishing. If successful, return a new fishing timer.
+        Otherwise return None
+        '''
+        new_fish_timer = None
+        if old_fish_timer - time.time() > 40:
+            self.focusedInput('SPACE')
+            print('Initiating fishing...')
+            new_fish_timer = time.time()
+        return new_fish_timer
+
+    def putOnBait(self):
+        '''Put on a bait. If the bait is put on successfully, return True,
+        otherwise return False.
+        '''
+        time.sleep(0.2) # Allow for proper input
+        self.focusedInput(static.FISHING_LURE_SLOT) # Put on lure
+        time.sleep(0.5) # Allow for message to appear
+        new_state = self.checkFishingState()
+        if new_state != 4:
+            print('Failed to put on lure.')
+            return False
+        return True
+
+    def pullUp(self):
+        '''Initiate after detecting a fish.
+        '''
+        msg = self.readTextInRange(static.MESSAGE_LOG_COORD, view_range=False)
+        fish_type = self.readFishType(msg)
+        wait_time = self.calculateFishWaitTime(fish_type)
+        time.sleep(wait_time)
+        print(f'Pulling up after {round(wait_time, 2)} seconds...')
+        self.focusedInput('SPACE') # Pull up
+        return None
 
     def fishAWhile(self):
         '''Perform several catches. Stop after a while.
@@ -57,11 +163,11 @@ class Fisher(InGameBot):
         fishing_count = 0
         self.fishing_impossible = False # Allow for fishing to start
         while (not self.fishing_impossible) and (fishing_count <= 10):
-            self.fish()
+            self.fishOutsideProduction()
             fishing_count += 1
         return True
 
-    def fish(self):
+    def fishOutsideProduction(self):
         '''Assuming all fishing requirements were fulfilled, start fishing.
         Return True if the fishing was successful, and False otherwise.
         '''
@@ -77,7 +183,7 @@ class Fisher(InGameBot):
         print('Initiating fishing...')
         time.sleep(10) # No fish in the first 10 seconds
         while (not self.fishing_finished) and (time_checked < 50):
-            fishing_state = self.checkFishingState()
+            fishing_state = self.checkFishingProgress()
             if isinstance(fishing_state, str): # Fish caught
                 print(f'{fishing_state} found. The wait took {round(time.time() - start, 2)} seconds.')
                 wait_time = self.calculateFishWaitTime(fishing_state)
@@ -121,7 +227,7 @@ class Fisher(InGameBot):
         self.fishing_impossible = False
         return True
 
-    def checkFishingState(self):
+    def checkFishingProgress(self):
         '''A method for periodically checking whether the fishing has finished yet.
         If a fish has been spotted, return a string with the name of the fish,
         otherwise return None.
@@ -161,7 +267,7 @@ class Fisher(InGameBot):
         caught = self.checkStringForMatches(msg, static.FISHING_FISH_CAUGHT_KEYWORDS)
         if gone > 0: # Fish gone
             return None
-        if caught > 1: # Successful catch
+        if caught > 1 and not settings.PRODUCTION: # Successful catch
             with open('fish_stats.txt', 'a') as f:
                 f.write(f'Fish: {fish}, Wait time since message detection: {round(time,2)}s, Date: {datetime.now()}\n')
         return None

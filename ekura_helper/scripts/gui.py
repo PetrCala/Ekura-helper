@@ -24,11 +24,20 @@ class GUI:
     def main(self):
         '''The main method for initiating the graphical user interface
         '''
+        bot_buttons = {'-TOGGLE-FISHING-': False, '-TOGGLE-MINING-': False}
+        bot_fish_timer = time.time() - 99 # Arbitrary timestamp
+
         main_w = self.mainWindow()
 
         while True:
             window, event, values = sg.read_all_windows()
             #print(event, values)
+
+            #----- State of bot actions -----
+            fishing_on = bot_buttons.get('-TOGGLE-FISHING-')
+            mining_on = bot_buttons.get('-TOGGLE-MINING-')
+            bot_state = [fishing_on, mining_on]
+            bot_idle = not any(bot_state)
 
             #------ Main window events ------
             if event in (sg.WINDOW_CLOSED, '-BACK-', 'Quit'):
@@ -64,12 +73,31 @@ class GUI:
             #------ Miner events -----
 
             #----- Fisher events -----
-            elif event == '-START-FISHING-':
-                char_name = values['-CHARACTER-NAMES-'][0]
-                gt.startFishing(char_name)
+            elif event == '-TOGGLE-FISHING-':
+                if (not bot_buttons[event]) and (not bot_idle): # Bot already working
+                    print('You must turn off the bot\'s other action first.')
+                else: # Check passed    
+                    bot_buttons[event] = not bot_buttons[event] # Change button state
+                    if bot_buttons[event]:
+                        window[event].update(button_color='light grey')
+                    else:
+                        window[event].update(button_color=sg.theme_button_color())
 
-            elif event == '-STOP-FISHING-':
-                gt.stopFishing()
+            #----- Bot actions -----
+            if sum(bot_state) > 2:
+                raise SystemError('The bot must never be allowed to perform more than 1 action at once.')
+            elif sum(bot_state) == 1:
+                char_name = values['-CHARACTER-NAMES-'][0]
+                if fishing_on:
+                    if time.time() - bot_fish_timer > 0.5: # Check interval
+                        outcome, new_fish_timer = gt.fishInGUI(char_name, bot_fish_timer)
+                        if outcome is False: # Turn the fishing off
+                            bot_buttons['-TOGGLE-FISHING-'] = False
+                            window[event].update(button_color=sg.theme_button_color())
+                        if new_fish_timer is not None:
+                            bot_fish_timer = new_fish_timer # Update the timer since last fishing
+                elif mining_on:
+                    gt.mineInGUI(char_name)
 
         return None
 
@@ -81,7 +109,7 @@ class GUI:
 
 
         col_left_layout = [
-                [self.loginWindow()]
+                [gt.login_window()]
             ]
         col_middle_layout = [[sg.Frame(layout = [
                     [gt.output_window()]
@@ -89,8 +117,7 @@ class GUI:
                 title = 'Output')
         ]]
         col_right_layout = [[sg.Frame(layout = [
-                    [sg.Button('Fish', key = '-START-FISHING-'),
-                     sg.Button('Stop', key = '-STOP-FISHING-')]
+                    [gt.toggle_button('Fishing', key = '-TOGGLE-FISHING-')]
                 ],
                 title = 'Fishing')
         ]]
@@ -103,31 +130,6 @@ class GUI:
 
         return sg.Window(static.APP_NAME, layout, size = (static.GUI_WIDTH,static.GUI_HEIGHT), finalize=True)
 
-    @staticmethod
-    def loginWindow():
-        '''Return the sg.Frame of the login window.
-        '''
-        frame = sg.Frame(layout=[
-                [sg.Text('Account name:', size = (14,1)),
-                 sg.Listbox(local_data.get('ACCOUNT_NAMES'), default_values = local_data.get('ACCOUNT_NAMES')[0],
-                    size = (18,1), key = '-ACCOUNT-NAMES-'),
-                 sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
-                ],
-                [sg.Text('Character name:', size = (14,1)),
-                 sg.Listbox(local_data.get('CHARACTER_NAMES'), default_values = local_data.get('CHARACTER_NAMES')[0],
-                    size = (18,1), key = '-CHARACTER-NAMES-'),
-                 sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
-                ],
-                [sg.Column([[
-                    sg.Button('Launch', key = '-LAUNCH-GAME-ONLY-'),
-                    sg.Button('Login', key = '-LOGIN-ONLY-'),
-                    sg.Button('Launch and login', key = '-LAUNCH-AND-LOGIN-')
-                    ]], justification = 'center')
-                ]
-            ]
-            ,title = 'Login'
-        )
-        return frame
 
     @staticmethod
     def startTimer(timer_time:int=3600):
