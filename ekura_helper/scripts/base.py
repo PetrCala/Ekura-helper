@@ -420,9 +420,9 @@ class InGameBot(Base):
     def validateGamePos(self):
         '''Check that the game window is in a position where all important inputs can be read.
         '''
-        if not settings.PRODUCTION:
-            print('Validating game position...')
-            start_time = time.time()
+        # if not settings.PRODUCTION:
+        #     print('Validating game position...')
+        #     start_time = time.time()
         screen_pos = self.screen_pos # Actual game position
         monitor_pos = self.monitor_coords # Monitor position
         x_verify, y_verify = [], [] # Coordinates to be verified
@@ -438,9 +438,9 @@ class InGameBot(Base):
         if not x_valid and y_valid:
             raise SystemError('Some crucial parts of the game window are hidden. Please recenter the game window.')
         # Possibly move the game automatically to a pre-defined location, if it makes more sense
-        if not settings.PRODUCTION:
-            validation_time = round(time.time() - start_time, 2)
-            print(f'The game position is valid. The validation took {validation_time} seconds.')
+        # if not settings.PRODUCTION:
+            # validation_time = round(time.time() - start_time, 2)
+            # print(f'The game position is valid. The validation took {validation_time} seconds.')
         return True
         
     def getGameCoords(self):

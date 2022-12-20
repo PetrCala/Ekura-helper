@@ -1,6 +1,7 @@
 ﻿import os
 import re
 from pathlib import Path
+from datetime import datetime
 
 import PySimpleGUI as sg
 
@@ -51,12 +52,12 @@ def login_window():
     frame = sg.Frame(layout=[
             [sg.Text('Account name:', size = (14,1)),
                 sg.Listbox(local_data.get('ACCOUNT_NAMES'), default_values = local_data.get('ACCOUNT_NAMES')[0],
-                size = (18,1), key = '-ACCOUNT-NAMES-'),
+                size = (18,1), enable_events = True, key = '-ACCOUNT-NAMES-'),
                 sg.Button('Edit', key = '-EDIT-ACCOUNT-NAMES-')
             ],
             [sg.Text('Character name:', size = (14,1)),
                 sg.Listbox(local_data.get('CHARACTER_NAMES'), default_values = local_data.get('CHARACTER_NAMES')[0],
-                size = (18,1), key = '-CHARACTER-NAMES-'),
+                size = (18,1), enable_events = True, key = '-CHARACTER-NAMES-'),
                 sg.Button('Edit', key = '-EDIT-CHARACTER-NAMES-')
             ],
             [sg.Column([[
@@ -153,10 +154,16 @@ def fishInGUI(char_name:str, old_fish_timer):
     '''
     try:
         F = Fisher(char_name)
-    except:
-        pass # Handle this later - game not on
+    except Exception as e:
+        print("Exception occured:", e)
+        return False, None
+    print('checking state...')
+    return False, old_fish_timer
     state = F.checkFishingState()
+    print(state, 'Handling fishing state...')
     outcome, new_fish_timer = F.handleFishingState(state, old_fish_timer)
+    time_to_print = new_fish_timer if new_fish_timer is not None else old_fish_timer
+    print("State:", state, datetime.fromtimestamp(time_to_print).strftime('%H:%M:%S'))
     return outcome, new_fish_timer
 
 

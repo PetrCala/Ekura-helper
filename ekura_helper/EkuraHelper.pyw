@@ -21,12 +21,12 @@ local_data = readLocalData()
 #----- Main -----
 def main():
     #----- Run GUI -----
-    # G = GUI()
-    # G.main()
+    G = GUI()
+    G.main()
 
     #----- Fish -----
-    F = Fisher(char_name = 'Stand')
-    F.main()
+    # F = Fisher(char_name = 'Stand')
+    # F.main()
 
 
     #----- Mine -----

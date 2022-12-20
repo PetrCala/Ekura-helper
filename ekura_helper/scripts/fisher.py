@@ -95,30 +95,34 @@ class Fisher(InGameBot):
         new_fish_timer = None
         if state == 0:
             new_fish_timer = self.tryFishing(old_fish_timer)
-            if not settings.PRODUCTION:
-                print('Fish state checked...')
         elif state == 6:
             print('Fishing is impossible here.')
             return False, new_fish_timer
         elif state == 5:
             print('You have no bait on the rod.\nPutting on a bait...')
-            bait_on = self.putOnBait()
-            if not bait_on: # Impossible to put on a bait
+            try:
+                bait_on = self.putOnBait()
+                if not bait_on: # Impossible to put on a bait
+                    return False, new_fish_timer
+            except Exception as e:
+                print("Exception occured:, e")
                 return False, new_fish_timer
         elif state == 4:
             print('Bait is on. Initiating fishing...')
-            if old_fish_timer - time.time() > 20:
+            if time.time() - old_fish_timer > 20:
                 self.focusedInput('SPACE')
                 new_fish_timer = time.time()
         elif state == 3:
-            self.pullUp()
+            try:
+                self.pullUp()
+            except Exception as e:
+                print("Exception occured:", e)
+                return False, new_fish_timer
         elif state == 2:
             print('Fish caught successfully.')
-            time.sleep(1.5)
             new_fish_timer = self.tryFishing(old_fish_timer)
         elif state == 1:
             print('Fish escaped.')
-            time.sleep(1.5)
             new_fish_timer = self.tryFishing(old_fish_timer)
         return True, new_fish_timer
 
@@ -127,7 +131,7 @@ class Fisher(InGameBot):
         Otherwise return None
         '''
         new_fish_timer = None
-        if old_fish_timer - time.time() > 40:
+        if time.time() - old_fish_timer > 40:
             self.focusedInput('SPACE')
             print('Initiating fishing...')
             new_fish_timer = time.time()

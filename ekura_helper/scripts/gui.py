@@ -24,20 +24,32 @@ class GUI:
     def main(self):
         '''The main method for initiating the graphical user interface
         '''
+        # Placeholders
+        acc_name = self.getDefaultAcc()
+        char_name = self.getDefaultChar()
+        # Bot information
         bot_buttons = {'-TOGGLE-FISHING-': False, '-TOGGLE-MINING-': False}
         bot_fish_timer = time.time() - 99 # Arbitrary timestamp
+        terminate_fishing = False # Only call when fishing is active
+        terminate_mining = False # Only call when mining is active
+        bot_idle = True
 
         main_w = self.mainWindow()
 
         while True:
-            window, event, values = sg.read_all_windows()
-            #print(event, values)
+            window, event, values = sg.read_all_windows(timeout=500)
+            # print(event, values)
 
-            #----- State of bot actions -----
-            fishing_on = bot_buttons.get('-TOGGLE-FISHING-')
-            mining_on = bot_buttons.get('-TOGGLE-MINING-')
-            bot_state = [fishing_on, mining_on]
-            bot_idle = not any(bot_state)
+            #----- Bot termination procedure -----
+            if terminate_fishing:
+                event = '-TOGGLE-FISHING-'
+                #window = ?
+                terminate_fishing = False
+            elif terminate_mining:
+                event = '-TOGGLE-MINING-'
+                #window = ?
+                terminate_mining = False
+            print(event)
 
             #------ Main window events ------
             if event in (sg.WINDOW_CLOSED, '-BACK-', 'Quit'):
@@ -45,9 +57,15 @@ class GUI:
                 break
 
             #------ Login events ------
+            elif event == '-ACCOUNT-NAMES-':
+                acc_name = values['-ACCOUNT-NAMES-'][0]
+
             elif event == '-EDIT-ACCOUNT-NAMES-':
                 new_names_list = gt.editAccountNames()
                 window['-ACCOUNT-NAMES-'].update(new_names_list)
+
+            elif event == '-CHARACTER-NAMES-':
+                char_name = values['-CHARACTER-NAMES-'][0]
 
             elif event == '-EDIT-CHARACTER-NAMES-':
                 new_names_list = gt.editCharacterNames()
@@ -74,28 +92,36 @@ class GUI:
 
             #----- Fisher events -----
             elif event == '-TOGGLE-FISHING-':
-                if (not bot_buttons[event]) and (not bot_idle): # Bot already working
-                    print('You must turn off the bot\'s other action first.')
-                else: # Check passed    
-                    bot_buttons[event] = not bot_buttons[event] # Change button state
-                    if bot_buttons[event]:
-                        window[event].update(button_color='light grey')
-                    else:
-                        window[event].update(button_color=sg.theme_button_color())
+                try:
+                    if (not bot_buttons[event]) and (not bot_idle): # Bot already working
+                        print('You must turn off the bot\'s other action first.')
+                    elif char_name is None:
+                        print('You must choose the character first.')
+                    else: # Check passed    
+                        bot_buttons[event] = not bot_buttons[event] # Change button state
+                        # if bot_buttons[event]:
+                        #     window[event].update(button_color='light grey')
+                        # else:
+                        #     window[event].update(button_color=sg.theme_button_color())
+                except Exception as e:
+                    print("Exception:", e) # THERES NO WINDOW!!!! if you set the "event" manually
+
+            #----- State of bot actions -----
+            fishing_on = bot_buttons.get('-TOGGLE-FISHING-')
+            mining_on = bot_buttons.get('-TOGGLE-MINING-')
+            bot_state = [fishing_on, mining_on]
+            bot_idle = not any(bot_state)
 
             #----- Bot actions -----
             if sum(bot_state) > 2:
                 raise SystemError('The bot must never be allowed to perform more than 1 action at once.')
             elif sum(bot_state) == 1:
-                char_name = values['-CHARACTER-NAMES-'][0]
                 if fishing_on:
-                    if time.time() - bot_fish_timer > 0.5: # Check interval
-                        outcome, new_fish_timer = gt.fishInGUI(char_name, bot_fish_timer)
-                        if outcome is False: # Turn the fishing off
-                            bot_buttons['-TOGGLE-FISHING-'] = False
-                            window[event].update(button_color=sg.theme_button_color())
-                        if new_fish_timer is not None:
-                            bot_fish_timer = new_fish_timer # Update the timer since last fishing
+                    outcome, new_fish_timer = gt.fishInGUI(char_name, bot_fish_timer)
+                    if outcome is False: # Turn the fishing off
+                        terminate_fishing = True
+                    if new_fish_timer is not None:
+                        bot_fish_timer = new_fish_timer # Update the timer since last fishing
                 elif mining_on:
                     gt.mineInGUI(char_name)
 
@@ -107,7 +133,6 @@ class GUI:
         sg.theme(static.GUI_THEME)
         sg.set_options(font=(static.GUI_FONT,static.GUI_FONT_SIZE))
 
-
         col_left_layout = [
                 [gt.login_window()]
             ]
@@ -117,7 +142,7 @@ class GUI:
                 title = 'Output')
         ]]
         col_right_layout = [[sg.Frame(layout = [
-                    [gt.toggle_button('Fishing', key = '-TOGGLE-FISHING-')]
+                    [gt.toggle_button('Fish', key = '-TOGGLE-FISHING-')]
                 ],
                 title = 'Fishing')
         ]]
@@ -130,6 +155,22 @@ class GUI:
 
         return sg.Window(static.APP_NAME, layout, size = (static.GUI_WIDTH,static.GUI_HEIGHT), finalize=True)
 
+    @staticmethod
+    def getDefaultAcc():
+        '''Get the name of the default account from local files and return this name.
+        If there are no data, return None.
+        '''
+        accs = local_data.get('ACCOUNT_NAMES') 
+        acc = accs[0] if accs is not None else accs
+        return acc
+
+    @staticmethod
+    def getDefaultChar():
+        '''Similar to the getDefaultAcc method, only with character names.
+        '''
+        chars = local_data.get('CHARACTER_NAMES')
+        char = chars[0] if chars is not None else chars
+        return char
 
     @staticmethod
     def startTimer(timer_time:int=3600):
